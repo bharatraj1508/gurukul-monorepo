@@ -30,6 +30,7 @@ import { ModalType } from '@/lib/store/types/modal';
 
 import { ClassModal } from '../modals/ClassModal';
 import { CourseModal } from '../modals/CourseModal';
+import { DiaryModal } from '../modals/DiaryModal';
 
 // Registry: one line per modal. React.ComponentType<any> is intentional —
 // each modal narrows its own payload type internally.
@@ -61,6 +62,7 @@ const Modal: { [key in ModalType]?: React.ComponentType<any> } = {
   [ModalType.LinkParentModal]: LinkParentModal,
   [ModalType.EditParentLinkModal]: EditParentLinkModal,
   [ModalType.TeacherProfileModal]: TeacherProfileModal,
+  [ModalType.DiaryModal]: DiaryModal,
 };
 
 export default function ModalDialog() {
