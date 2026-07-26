@@ -5,6 +5,7 @@ import { attendanceFeature } from './attendance';
 import { classFeature } from './class';
 import { courseFeature } from './course';
 import { dashboardFeature } from './dashboard';
+import { diaryFeature } from './diary';
 import { enrolmentFeature } from './enrolment';
 import { feeFeature } from './fee';
 import { gradeFeature } from './grade';
@@ -26,6 +27,7 @@ export const FEATURES: Readonly<Record<FeatureKey, FeatureDefinition>> = {
   program: programFeature,
   course: courseFeature,
   class: classFeature,
+  diary: diaryFeature,
   instructor: instructorFeature,
   student: studentFeature,
   parent: parentFeature,
@@ -91,6 +93,14 @@ export const PERMS = {
     create: p('class', 'create-classes'),
     edit: p('class', 'edit-classes'),
     delete: p('class', 'delete-classes'),
+  },
+  diary: {
+    all: FEATURES.diary.all,
+    view: p('diary', 'view-diary'),
+    viewOwn: p('diary', 'view-own-diary'),
+    create: p('diary', 'create-diary'),
+    edit: p('diary', 'edit-diary'),
+    delete: p('diary', 'delete-diary'),
   },
   instructor: {
     all: FEATURES.instructor.all,

@@ -13,6 +13,11 @@ export const classIncharge: DefaultRoleDefinition = {
     // Academics
     PERMS.course.view.id,
     PERMS.class.view.id,
+    // Work Diary — author for their class
+    PERMS.diary.viewOwn.id,
+    PERMS.diary.create.id,
+    PERMS.diary.edit.id,
+    PERMS.diary.delete.id,
     // People
     PERMS.student.view.id,
     PERMS.student.edit.id,
