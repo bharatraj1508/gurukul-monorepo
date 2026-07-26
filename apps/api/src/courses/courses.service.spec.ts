@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from 'nestjs-prisma';
@@ -24,6 +28,12 @@ describe('CoursesService', () => {
       count: jest.fn(),
     },
     classInstructorCourse: {
+      findMany: jest.fn(),
+    },
+    studentProfile: {
+      findFirst: jest.fn(),
+    },
+    enrolment: {
       findMany: jest.fn(),
     },
   };
@@ -137,6 +147,148 @@ describe('CoursesService', () => {
     });
   });
 
+  describe('findAll', () => {
+    it('returns the unfiltered list when scope is "all"', async () => {
+      prisma.course.findMany.mockResolvedValue([{ id: 'course-1' }]);
+
+      const result = await service.findAll('tenant-1', {}, { scope: 'all' });
+
+      expect(prisma.studentProfile.findFirst).not.toHaveBeenCalled();
+      expect(prisma.course.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { tenantId: 'tenant-1', deletedAt: null },
+        }),
+      );
+      expect(result).toEqual([{ id: 'course-1' }]);
+    });
+
+    it('scopes to the student’s enrolled program(s) when scope is "own"', async () => {
+      prisma.studentProfile.findFirst.mockResolvedValue({ id: 'student-1' });
+      prisma.enrolment.findMany.mockResolvedValue([
+        { class: { programId: 'program-1' } },
+      ]);
+      prisma.course.findMany.mockResolvedValue([
+        { id: 'course-1', programId: 'program-1' },
+      ]);
+
+      const result = await service.findAll(
+        'tenant-1',
+        {},
+        { scope: 'own', membershipId: 'membership-1' },
+      );
+
+      expect(prisma.studentProfile.findFirst).toHaveBeenCalledWith({
+        where: {
+          tenantId: 'tenant-1',
+          tenantMembershipId: 'membership-1',
+          deletedAt: null,
+        },
+        select: { id: true },
+      });
+      expect(prisma.enrolment.findMany).toHaveBeenCalledWith({
+        where: {
+          tenantId: 'tenant-1',
+          studentProfileId: 'student-1',
+          status: 'ACTIVE',
+          deletedAt: null,
+          class: { deletedAt: null },
+        },
+        select: { class: { select: { programId: true } } },
+      });
+      expect(prisma.course.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            tenantId: 'tenant-1',
+            deletedAt: null,
+            AND: [{ programId: { in: ['program-1'] } }],
+          }),
+        }),
+      );
+      expect(result).toEqual([{ id: 'course-1', programId: 'program-1' }]);
+    });
+
+    it('unions program ids across multiple active enrolments', async () => {
+      prisma.studentProfile.findFirst.mockResolvedValue({ id: 'student-1' });
+      prisma.enrolment.findMany.mockResolvedValue([
+        { class: { programId: 'program-1' } },
+        { class: { programId: 'program-2' } },
+      ]);
+      prisma.course.findMany.mockResolvedValue([]);
+
+      await service.findAll(
+        'tenant-1',
+        {},
+        { scope: 'own', membershipId: 'membership-1' },
+      );
+
+      expect(prisma.course.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            AND: [{ programId: { in: ['program-1', 'program-2'] } }],
+          }),
+        }),
+      );
+    });
+
+    it('returns an empty list without querying courses when the student has no active enrolments', async () => {
+      prisma.studentProfile.findFirst.mockResolvedValue({ id: 'student-1' });
+      prisma.enrolment.findMany.mockResolvedValue([]);
+
+      const result = await service.findAll(
+        'tenant-1',
+        {},
+        { scope: 'own', membershipId: 'membership-1' },
+      );
+
+      expect(result).toEqual([]);
+      expect(prisma.course.findMany).not.toHaveBeenCalled();
+    });
+
+    it('returns an empty list when no student profile is linked to the membership', async () => {
+      prisma.studentProfile.findFirst.mockResolvedValue(null);
+
+      const result = await service.findAll(
+        'tenant-1',
+        {},
+        { scope: 'own', membershipId: 'membership-1' },
+      );
+
+      expect(result).toEqual([]);
+      expect(prisma.enrolment.findMany).not.toHaveBeenCalled();
+      expect(prisma.course.findMany).not.toHaveBeenCalled();
+    });
+
+    it('combines the "own" scope filter with an explicit search filter', async () => {
+      prisma.studentProfile.findFirst.mockResolvedValue({ id: 'student-1' });
+      prisma.enrolment.findMany.mockResolvedValue([
+        { class: { programId: 'program-1' } },
+      ]);
+      prisma.course.findMany.mockResolvedValue([]);
+
+      await service.findAll(
+        'tenant-1',
+        { search: 'math' },
+        { scope: 'own', membershipId: 'membership-1' },
+      );
+
+      expect(prisma.course.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            AND: [
+              { programId: { in: ['program-1'] } },
+              {
+                OR: [
+                  { name: { contains: 'math', mode: 'insensitive' } },
+                  { code: { contains: 'math', mode: 'insensitive' } },
+                ],
+              },
+            ],
+          }),
+        }),
+      );
+    });
+  });
+
   describe('findOne', () => {
     it('attaches teachers scoped by class-course assignments', async () => {
       prisma.course.findFirst.mockResolvedValue({
@@ -186,6 +338,62 @@ describe('CoursesService', () => {
           className: 'Class A',
         },
       ]);
+    });
+
+    it('throws NotFoundException for a missing course regardless of scope', async () => {
+      prisma.course.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.findOne('tenant-1', 'course-missing', {
+          scope: 'own',
+          membershipId: 'membership-1',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('returns the course when scope is "own" and it is in the student’s program', async () => {
+      prisma.course.findFirst.mockResolvedValue({
+        id: 'course-1',
+        programId: 'program-1',
+        program: { id: 'program-1', name: 'Science', code: 'SCI', classes: [] },
+      });
+      prisma.studentProfile.findFirst.mockResolvedValue({ id: 'student-1' });
+      prisma.enrolment.findMany.mockResolvedValue([
+        { class: { programId: 'program-1' } },
+      ]);
+      prisma.classInstructorCourse.findMany.mockResolvedValue([]);
+
+      const result = await service.findOne('tenant-1', 'course-1', {
+        scope: 'own',
+        membershipId: 'membership-1',
+      });
+
+      expect(result.id).toBe('course-1');
+    });
+
+    it('throws ForbiddenException when scope is "own" and the course is outside the student’s program(s)', async () => {
+      prisma.course.findFirst.mockResolvedValue({
+        id: 'course-1',
+        programId: 'program-other',
+        program: {
+          id: 'program-other',
+          name: 'Arts',
+          code: 'ART',
+          classes: [],
+        },
+      });
+      prisma.studentProfile.findFirst.mockResolvedValue({ id: 'student-1' });
+      prisma.enrolment.findMany.mockResolvedValue([
+        { class: { programId: 'program-1' } },
+      ]);
+
+      await expect(
+        service.findOne('tenant-1', 'course-1', {
+          scope: 'own',
+          membershipId: 'membership-1',
+        }),
+      ).rejects.toThrow(ForbiddenException);
+      expect(prisma.classInstructorCourse.findMany).not.toHaveBeenCalled();
     });
   });
 
