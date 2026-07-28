@@ -78,8 +78,11 @@ export function Modal({
               </DialogTitle>
             )}
             {description && (
-              <DialogDescription className="text-sm text-muted-foreground">
-                {description}
+              <DialogDescription
+                className="text-sm text-muted-foreground"
+                asChild={typeof description !== 'string'}
+              >
+                {typeof description === 'string' ? description : <div>{description}</div>}
               </DialogDescription>
             )}
           </DialogHeader>
