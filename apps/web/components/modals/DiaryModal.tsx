@@ -30,10 +30,18 @@ interface DiaryModalProps {
   presetClassId?: string;
 }
 
+// Mirrors DIARY_NOTE_MAX_LENGTH on the API so an over-long note is caught here
+// rather than coming back as a 400.
+const NOTE_MAX_LENGTH = 5000;
+
 const diaryFormSchema = z.object({
   classId: z.string().optional(),
   courseId: z.string().optional(),
-  note: z.string().trim().min(1, 'Please enter a note'),
+  note: z
+    .string()
+    .trim()
+    .min(1, 'Please enter a note')
+    .max(NOTE_MAX_LENGTH, `Note cannot exceed ${NOTE_MAX_LENGTH} characters`),
 });
 type FormValues = z.infer<typeof diaryFormSchema>;
 
@@ -247,6 +255,7 @@ export function DiaryModal({ editingDiary, presetClassId }: DiaryModalProps) {
               <FieldLabel>Note *</FieldLabel>
               <Textarea
                 rows={4}
+                maxLength={NOTE_MAX_LENGTH}
                 placeholder="e.g. Bring your art supplies tomorrow."
                 {...register('note')}
               />
