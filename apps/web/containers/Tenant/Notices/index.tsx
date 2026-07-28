@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useNotices, useDeleteNotice, Notice } from '@/services/api/requests/notices';
+import { useCurrentUserProfile } from '@/services/api/requests/users';
 import { usePermission } from '@/hooks/use-permission';
 import { useShowNoticeModal, useShowNoticeDetailModal } from '@/hooks/use-modal';
 import { PERMS } from '@repo/permissions';
@@ -24,6 +25,8 @@ export default function TenantNoticesContainer() {
   
   const showNoticeModal = useShowNoticeModal();
   const showNoticeDetailModal = useShowNoticeDetailModal();
+
+  const { data: profile } = useCurrentUserProfile();
 
   const { data: notices, isLoading } = useNotices(
     activeTab !== 'ALL' ? { scope: activeTab } : undefined
@@ -164,8 +167,16 @@ export default function TenantNoticesContainer() {
                 EXPIRED: XCircle,
               }[status];
 
-              const isCreatorOrAdmin = notice.createdBy === undefined || hasPermission(PERMS.notice.viewAll);
-              const canEdit = isCreatorOrAdmin;
+              const isOwner = !!notice.createdBy && notice.createdBy === profile?.id;
+              const canEditNotice =
+                hasPermission(PERMS.notice.viewAll) ||
+                hasPermission(PERMS.notice.manage) ||
+                (isOwner && hasPermission(PERMS.notice.editOwn));
+              const canDeleteNotice =
+                hasPermission(PERMS.notice.viewAll) ||
+                hasPermission(PERMS.notice.manage) ||
+                (isOwner && hasPermission(PERMS.notice.deleteOwn));
+              const canManageNotice = canEditNotice || canDeleteNotice;
               
               return (
                 <div 
@@ -185,7 +196,7 @@ export default function TenantNoticesContainer() {
                         </Badge>
                       </div>
                       
-                      {canEdit && (
+                      {canManageNotice && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                             <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity">
@@ -193,12 +204,16 @@ export default function TenantNoticesContainer() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-36">
-                            <DropdownMenuItem onClick={(e) => handleEdit(notice, e)}>
-                              <Edit className="h-4 w-4 mr-2" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => handleDelete(notice, e)} className="text-red-600 dark:text-red-400">
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete
-                            </DropdownMenuItem>
+                            {canEditNotice && (
+                              <DropdownMenuItem onClick={(e) => handleEdit(notice, e)}>
+                                <Edit className="h-4 w-4 mr-2" /> Edit
+                              </DropdownMenuItem>
+                            )}
+                            {canDeleteNotice && (
+                              <DropdownMenuItem onClick={(e) => handleDelete(notice, e)} className="text-red-600 dark:text-red-400">
+                                <Trash2 className="h-4 w-4 mr-2" /> Delete
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}

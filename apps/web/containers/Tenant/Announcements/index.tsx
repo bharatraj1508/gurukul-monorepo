@@ -6,6 +6,7 @@ import {
   useDeleteAnnouncement,
   Announcement,
 } from '@/services/api/requests/announcements';
+import { useCurrentUserProfile } from '@/services/api/requests/users';
 import { usePermission } from '@/hooks/use-permission';
 import {
   useShowAnnouncementModal,
@@ -40,6 +41,7 @@ import { toast } from 'sonner';
 
 export default function TenantAnnouncementsContainer() {
   const { hasPermission } = usePermission();
+  const { data: profile } = useCurrentUserProfile();
   const [activeTab, setActiveTab] = useState<'PUBLISHED' | 'APPROVAL_QUEUE' | 'MY_SUBMISSIONS'>('PUBLISHED');
 
   const showAnnouncementModal = useShowAnnouncementModal();
@@ -209,9 +211,16 @@ export default function TenantAnnouncementsContainer() {
                 REJECTED: XCircle,
               }[announcement.status];
 
-              const canEdit =
-                canViewAll ||
-                (announcement.createdBy === undefined || announcement.status !== 'APPROVED');
+              const isOwner = !!announcement.createdBy && announcement.createdBy === profile?.id;
+              const canEditAnnouncement =
+                hasPermission(PERMS.announcement.viewAll) ||
+                hasPermission(PERMS.announcement.manage) ||
+                (isOwner && hasPermission(PERMS.announcement.editOwn) && announcement.status !== 'APPROVED');
+              const canDeleteAnnouncement =
+                hasPermission(PERMS.announcement.viewAll) ||
+                hasPermission(PERMS.announcement.manage) ||
+                (isOwner && hasPermission(PERMS.announcement.deleteOwn));
+              const canManageAnnouncement = canEditAnnouncement || canDeleteAnnouncement;
 
               return (
                 <div
@@ -243,7 +252,7 @@ export default function TenantAnnouncementsContainer() {
                           </Button>
                         )}
 
-                        {canEdit && (
+                        {canManageAnnouncement && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                               <Button
@@ -255,15 +264,19 @@ export default function TenantAnnouncementsContainer() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-36">
-                              <DropdownMenuItem onClick={(e) => handleEdit(announcement, e)}>
-                                <Edit className="h-4 w-4 mr-2" /> Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => handleDelete(announcement, e)}
-                                className="text-red-600 dark:text-red-400"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" /> Delete
-                              </DropdownMenuItem>
+                              {canEditAnnouncement && (
+                                <DropdownMenuItem onClick={(e) => handleEdit(announcement, e)}>
+                                  <Edit className="h-4 w-4 mr-2" /> Edit
+                                </DropdownMenuItem>
+                              )}
+                              {canDeleteAnnouncement && (
+                                <DropdownMenuItem
+                                  onClick={(e) => handleDelete(announcement, e)}
+                                  className="text-red-600 dark:text-red-400"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         )}
