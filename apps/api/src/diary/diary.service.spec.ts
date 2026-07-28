@@ -88,6 +88,7 @@ describe('DiaryService', () => {
       prisma.program.findFirst.mockResolvedValue({ id: 'program-1' });
       prisma.class.findFirst.mockResolvedValue({
         id: 'class-1',
+        academicTermId: 'term-1',
         programId: 'program-1',
       });
       prisma.diary.create.mockResolvedValue({ id: 'diary-1' });
@@ -114,6 +115,7 @@ describe('DiaryService', () => {
       prisma.program.findFirst.mockResolvedValue({ id: 'program-1' });
       prisma.class.findFirst.mockResolvedValue({
         id: 'class-1',
+        academicTermId: 'term-1',
         programId: 'other-program',
       });
 
@@ -128,6 +130,7 @@ describe('DiaryService', () => {
       prisma.program.findFirst.mockResolvedValue({ id: 'program-1' });
       prisma.class.findFirst.mockResolvedValue({
         id: 'class-1',
+        academicTermId: 'term-1',
         programId: 'program-1',
       });
       prisma.enrolment.findMany.mockResolvedValue([
@@ -148,6 +151,7 @@ describe('DiaryService', () => {
       prisma.program.findFirst.mockResolvedValue({ id: 'program-1' });
       prisma.class.findFirst.mockResolvedValue({
         id: 'class-1',
+        academicTermId: 'term-1',
         programId: 'program-1',
       });
       prisma.classInstructor.findFirst.mockResolvedValue(null);
@@ -163,6 +167,7 @@ describe('DiaryService', () => {
       prisma.program.findFirst.mockResolvedValue({ id: 'program-1' });
       prisma.class.findFirst.mockResolvedValue({
         id: 'class-1',
+        academicTermId: 'term-1',
         programId: 'program-1',
       });
       prisma.classInstructor.findFirst.mockResolvedValue({ id: 'ci-1' });
@@ -178,6 +183,7 @@ describe('DiaryService', () => {
       prisma.program.findFirst.mockResolvedValue({ id: 'program-1' });
       prisma.class.findFirst.mockResolvedValue({
         id: 'class-1',
+        academicTermId: 'term-1',
         programId: 'program-1',
       });
       prisma.diary.create.mockResolvedValue({ id: 'diary-1' });

@@ -386,6 +386,9 @@ export class DiaryService {
         'Class does not belong to the given program.',
       );
     }
+    if (klass.academicTermId !== termId) {
+      throw new BadRequestException('Class does not belong to the given term.');
+    }
   }
 
   private async assertCourseInProgram(
