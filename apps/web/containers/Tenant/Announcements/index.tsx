@@ -213,13 +213,9 @@ export default function TenantAnnouncementsContainer() {
 
               const isOwner = !!announcement.createdBy && announcement.createdBy === profile?.id;
               const canEditAnnouncement =
-                hasPermission(PERMS.announcement.viewAll) ||
-                hasPermission(PERMS.announcement.manage) ||
-                (isOwner && hasPermission(PERMS.announcement.editOwn) && announcement.status !== 'APPROVED');
+                canViewAll || (isOwner && hasPermission(PERMS.announcement.editOwn));
               const canDeleteAnnouncement =
-                hasPermission(PERMS.announcement.viewAll) ||
-                hasPermission(PERMS.announcement.manage) ||
-                (isOwner && hasPermission(PERMS.announcement.deleteOwn));
+                canViewAll || (isOwner && hasPermission(PERMS.announcement.deleteOwn));
               const canManageAnnouncement = canEditAnnouncement || canDeleteAnnouncement;
 
               return (
