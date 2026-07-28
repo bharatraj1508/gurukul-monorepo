@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -62,6 +63,10 @@ export class AnnouncementsService {
     const now = new Date();
     const startDate = dto.sendImmediately ? now : new Date(dto.startDate!);
     const endDate = new Date(dto.endDate);
+
+    if (endDate <= startDate) {
+      throw new BadRequestException('endDate must be after startDate.');
+    }
 
     // Principals and Admins auto-approve their announcements. HoDs & Coordinators submit for approval.
     const status = isApprover ? 'APPROVED' : 'PENDING_APPROVAL';
@@ -238,6 +243,14 @@ export class AnnouncementsService {
 
     if (!isApprover && announcement.createdBy !== userId) {
       throw new ForbiddenException('You can only edit announcements you created.');
+    }
+
+    if (dto.startDate !== undefined || dto.endDate !== undefined) {
+      const newStartDate = dto.startDate ? new Date(dto.startDate) : announcement.startDate;
+      const newEndDate = dto.endDate ? new Date(dto.endDate) : announcement.endDate;
+      if (newEndDate <= newStartDate) {
+        throw new BadRequestException('endDate must be after startDate.');
+      }
     }
 
     // If previously rejected, editing resets status to PENDING_APPROVAL for re-review

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -133,6 +134,10 @@ export class NoticesService {
     const now = new Date();
     const startDate = dto.sendImmediately ? now : new Date(dto.startDate!);
     const endDate = new Date(dto.endDate);
+
+    if (endDate <= startDate) {
+      throw new BadRequestException('endDate must be after startDate.');
+    }
 
     const notice = await this.prisma.notice.create({
       data: {
@@ -360,6 +365,15 @@ export class NoticesService {
         if (count !== dto.classIds.length) {
           throw new ForbiddenException('One or more classes not found in this tenant.');
         }
+      }
+    }
+
+    // Re-run date range validation when dates are updated
+    if (dto.startDate !== undefined || dto.endDate !== undefined) {
+      const newStartDate = dto.startDate ? new Date(dto.startDate) : notice.startDate;
+      const newEndDate = dto.endDate ? new Date(dto.endDate) : notice.endDate;
+      if (newEndDate <= newStartDate) {
+        throw new BadRequestException('endDate must be after startDate.');
       }
     }
 
