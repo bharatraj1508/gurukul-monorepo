@@ -326,11 +326,35 @@ export class NoticesService {
     const notice = await this.findOne(tenantId, id);
     const membership = await this.getMembership(tenantId, userId);
     if (!membership) throw new ForbiddenException('Membership not found.');
-    const { isCoordinator } = this.getRoleContext(membership, isAdmin);
+    const { isCoordinator, isHod } = this.getRoleContext(membership, isAdmin);
 
     // Only author or coordinator/admin can edit
     if (!isCoordinator && notice.createdBy !== userId) {
       throw new ForbiddenException('You can only edit notices you created.');
+    }
+
+    // Re-run scope authorization whenever dto.scope is provided
+    if (dto.scope !== undefined) {
+      if (dto.scope === 'SCHOOL_WIDE' && !isCoordinator) {
+        throw new ForbiddenException('Only coordinators and admins can set school-wide scope.');
+      }
+      if (dto.scope === 'TEACHERS_ONLY' && !isCoordinator && !isHod) {
+        throw new ForbiddenException('Only coordinators, admins, and HODs can set teacher-only scope.');
+      }
+    }
+
+    // Re-run class ownership validation when updating classIds for CLASS scope
+    const targetScope = dto.scope ?? notice.scope;
+    if (targetScope === 'CLASS' && dto.classIds?.length) {
+      if (!isCoordinator && !isHod) {
+        const instructorClassIds = await this.getInstructorClassIds(tenantId, membership.id);
+        const unauthorized = dto.classIds.filter((id) => !instructorClassIds.includes(id));
+        if (unauthorized.length > 0) {
+          throw new ForbiddenException(
+            `You are not an instructor of the following classes: ${unauthorized.join(', ')}`,
+          );
+        }
+      }
     }
 
     // Handle classIds update
