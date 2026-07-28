@@ -343,16 +343,22 @@ export class NoticesService {
       }
     }
 
-    // Re-run class ownership validation when updating classIds for CLASS scope
-    const targetScope = dto.scope ?? notice.scope;
-    if (targetScope === 'CLASS' && dto.classIds?.length) {
+    // Re-run class ownership & tenant validation when dto.classIds is provided
+    if (dto.classIds !== undefined && dto.classIds.length) {
       if (!isCoordinator && !isHod) {
         const instructorClassIds = await this.getInstructorClassIds(tenantId, membership.id);
-        const unauthorized = dto.classIds.filter((id) => !instructorClassIds.includes(id));
+        const unauthorized = dto.classIds.filter((cid) => !instructorClassIds.includes(cid));
         if (unauthorized.length > 0) {
           throw new ForbiddenException(
             `You are not an instructor of the following classes: ${unauthorized.join(', ')}`,
           );
+        }
+      } else {
+        const count = await this.prisma.class.count({
+          where: { id: { in: dto.classIds }, tenantId, deletedAt: null },
+        });
+        if (count !== dto.classIds.length) {
+          throw new ForbiddenException('One or more classes not found in this tenant.');
         }
       }
     }
