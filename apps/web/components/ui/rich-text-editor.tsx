@@ -1,5 +1,6 @@
 'use client';
 
+import DOMPurify from 'isomorphic-dompurify';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
@@ -213,7 +214,7 @@ export function RichTextContent({ html, className }: { html: string; className?:
   return (
     <div 
       className={cn("prose dark:prose-invert prose-sm sm:prose-base max-w-none break-words", className)} 
-      dangerouslySetInnerHTML={{ __html: html }} 
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} 
     />
   );
 }
