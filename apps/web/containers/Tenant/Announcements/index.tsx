@@ -81,8 +81,8 @@ export default function TenantAnnouncementsContainer() {
       try {
         await deleteAnnouncement(announcement.id);
         toast.success('Announcement deleted successfully');
-      } catch (error) {
-        // error handled by mutation hook
+      } catch {
+        toast.error('Failed to delete announcement. Please try again.');
       }
     }
   };

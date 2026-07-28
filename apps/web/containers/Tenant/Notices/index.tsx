@@ -59,8 +59,8 @@ export default function TenantNoticesContainer() {
       try {
         await deleteNotice(notice.id);
         toast.success('Notice deleted successfully');
-      } catch (error) {
-        // error handled by mutation
+      } catch {
+        toast.error('Failed to delete notice. Please try again.');
       }
     }
   };
