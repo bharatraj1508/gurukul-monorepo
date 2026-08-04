@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 
 import { DEFAULT_ROLES } from '@repo/permissions';
+import { seedNoticesAndAnnouncements } from './seeders/notices-announcements.seed';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -948,6 +949,8 @@ async function main(): Promise<void> {
     (chunk) => prisma.enrolment.createMany({ data: chunk }),
     enrolmentRows,
   );
+
+  await seedNoticesAndAnnouncements(prisma);
 
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
   console.log(

@@ -32,6 +32,8 @@ model Tenant {
   enrolments             Enrolment[]
   sessions               Session[]
   savedFilters           SavedFilter[]
+  notices                Notice[]
+  announcements          Announcement[]
 
   @@map("tenants")
 }
@@ -77,6 +79,10 @@ model User {
   updatedParents       ParentProfile[]  @relation("ParentUpdatedBy")
   createdEnrolments    Enrolment[]      @relation("EnrolmentCreatedBy")
   savedFilters         SavedFilter[]
+  createdNotices       Notice[]         @relation("NoticeCreatedBy")
+  updatedNotices       Notice[]         @relation("NoticeUpdatedBy")
+  createdAnnouncements Announcement[]   @relation("AnnouncementCreatedBy")
+  approvedAnnouncements Announcement[]   @relation("AnnouncementApprovedBy")
 
   @@map("users")
 }
@@ -255,6 +261,7 @@ model Class {
   updater      User?             @relation("ClassUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   instructors  ClassInstructor[]
   enrolments   Enrolment[]
+  notices      NoticeClass[]
 
   @@index([tenantId, academicTermId])
   @@map("classes")
@@ -431,4 +438,71 @@ model SavedFilter {
 
   @@unique([tenantId, userId, feature, name])
   @@map("saved_filters")
+}
+
+// =====================================================
+// NOTICES
+// =====================================================
+model Notice {
+  id        String    @id @default(uuid()) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  title     String    @db.VarChar(255)
+  content   String    @db.Text
+  scope     String    @default("CLASS") @db.VarChar(50)
+  // scope: CLASS | TEACHERS_ONLY | SCHOOL_WIDE
+  startDate DateTime  @map("start_date") @db.Timestamptz(6)
+  endDate   DateTime  @map("end_date") @db.Timestamptz(6)
+  createdBy String?   @map("created_by") @db.Uuid
+  updatedBy String?   @map("updated_by") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant  Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator User?         @relation("NoticeCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User?         @relation("NoticeUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  classes NoticeClass[]
+
+  @@index([tenantId, scope, startDate, endDate])
+  @@map("notices")
+}
+
+model NoticeClass {
+  noticeId String @map("notice_id") @db.Uuid
+  classId  String @map("class_id") @db.Uuid
+
+  notice Notice @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  class  Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@id([noticeId, classId])
+  @@map("notice_classes")
+}
+
+// =====================================================
+// SCHOOL ANNOUNCEMENTS
+// =====================================================
+model Announcement {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenantId        String    @map("tenant_id") @db.Uuid
+  title           String    @db.VarChar(255)
+  content         String    @db.Text
+  status          String    @default("PENDING_APPROVAL") @db.VarChar(50)
+  // status: PENDING_APPROVAL | APPROVED | REJECTED
+  rejectionReason String?   @map("rejection_reason") @db.Text
+  approvedAt      DateTime? @map("approved_at") @db.Timestamptz(6)
+  approvedById    String?   @map("approved_by") @db.Uuid
+  startDate       DateTime  @map("start_date") @db.Timestamptz(6)
+  endDate         DateTime  @map("end_date") @db.Timestamptz(6)
+  createdBy       String?   @map("created_by") @db.Uuid
+  updatedBy       String?   @map("updated_by") @db.Uuid
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator  User?  @relation("AnnouncementCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  approver User?  @relation("AnnouncementApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status, startDate, endDate])
+  @@map("announcements")
 }

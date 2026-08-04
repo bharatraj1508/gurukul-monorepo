@@ -12,6 +12,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:reset": "prisma migrate reset",
     "prisma:seed": "prisma db seed",
+    "seed:communications": "node --import ts-node/esm ./prisma/seeders/notices-announcements.seed.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",

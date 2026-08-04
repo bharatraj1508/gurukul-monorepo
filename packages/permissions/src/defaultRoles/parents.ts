@@ -17,5 +17,8 @@ export const parentsRole: DefaultRoleDefinition = {
     PERMS.attendance.viewOwn.id,
     // Assessment — view own linked
     PERMS.grade.viewOwn.id,
+    // Announcements — view
+    PERMS.announcement.view.id,
+    PERMS.notice.view.id,
   ],
 };
