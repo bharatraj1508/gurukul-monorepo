@@ -311,7 +311,11 @@ export class TimetablesService {
       });
       if (!ref) throw new NotFoundException(`Timetable ${id} not found.`);
 
-      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${ref.academicTermId}))`;
+      // Use $executeRaw, not $queryRaw: pg_advisory_xact_lock returns SQL `void`,
+      // which the pg driver adapter cannot decode as a result column
+      // (UnsupportedNativeDataType). executeRaw runs the statement without
+      // decoding a typed result set.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${ref.academicTermId}))`;
 
       // Re-read under the lock — status may have changed while waiting.
       const target = await tx.timetable.findFirst({

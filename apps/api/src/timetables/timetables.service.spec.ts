@@ -35,6 +35,7 @@ describe('TimetablesService', () => {
     class: { count: jest.Mock };
     $transaction: jest.Mock;
     $queryRaw: jest.Mock;
+    $executeRaw: jest.Mock;
   };
   let snapshotService: { build: jest.Mock };
   let solverService: {
@@ -62,6 +63,7 @@ describe('TimetablesService', () => {
       class: { count: jest.fn().mockResolvedValue(0) },
       $transaction: jest.fn(),
       $queryRaw: jest.fn().mockResolvedValue([]),
+      $executeRaw: jest.fn().mockResolvedValue(1),
     };
     prisma.$transaction.mockImplementation(async (fn: any) =>
       typeof fn === 'function' ? fn(prisma) : Promise.all(fn),
@@ -447,7 +449,7 @@ describe('TimetablesService', () => {
 
       const result = await service.publish(TENANT_ID, 'tt-1', USER_ID);
 
-      expect(prisma.$queryRaw).toHaveBeenCalled();
+      expect(prisma.$executeRaw).toHaveBeenCalled();
       expect(prisma.timetable.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'tt-old' },
