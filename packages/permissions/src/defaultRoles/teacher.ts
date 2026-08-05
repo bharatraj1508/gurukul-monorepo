@@ -13,6 +13,11 @@ export const teacher: DefaultRoleDefinition = {
     // Academics — view own assigned
     PERMS.course.viewOwn.id,
     PERMS.class.viewOwn.id,
+    // Work Diary — author for own classes
+    PERMS.diary.viewOwn.id,
+    PERMS.diary.create.id,
+    PERMS.diary.edit.id,
+    PERMS.diary.delete.id,
     // People — view students in own classes
     PERMS.student.view.id,
     PERMS.parent.view.id,

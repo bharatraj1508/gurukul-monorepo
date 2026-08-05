@@ -16,6 +16,8 @@ export const coordinators: DefaultRoleDefinition = {
     PERMS.course.all.id,
     PERMS.class.all.id,
     PERMS.instructor.all.id,
+    // Work Diary — read-only oversight
+    PERMS.diary.view.id,
     // People
     PERMS.student.all.id,
     PERMS.parent.all.id,

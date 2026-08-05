@@ -17,6 +17,7 @@ import { AtGuard } from './common/guards/at.guard';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { CoursesModule } from './courses/courses.module';
+import { DiaryModule } from './diary/diary.module';
 import { EnrolmentsModule } from './enrolments/enrolments.module';
 import { InstructorsModule } from './instructors/instructors.module';
 import { MembersModule } from './members/members.module';
@@ -91,6 +92,7 @@ import { UsersModule } from './users/users.module';
     ClassesModule,
     InstructorsModule,
     CoursesModule,
+    DiaryModule,
     EnrolmentsModule,
     ParentsModule,
     TeachersModule,

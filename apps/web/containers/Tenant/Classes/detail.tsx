@@ -24,6 +24,7 @@ import {
   useShowBulkEnrolModal,
   useShowClassModal,
   useShowDeleteModal,
+  useShowDiaryModal,
   useShowEnrolStudentModal,
   useShowManageInstructorCoursesModal,
 } from '@/hooks/use-modal';
@@ -54,6 +55,7 @@ import {
   Info,
   Loader2,
   MoreVertical,
+  NotebookPen,
   RefreshCw,
   UserMinus,
   Users,
@@ -326,6 +328,7 @@ export default function TenantClassDetailContainer({
 
   const { hasPermission } = usePermission();
   const showClassModal = useShowClassModal();
+  const showDiaryModal = useShowDiaryModal();
   const showEnrolStudentModal = useShowEnrolStudentModal();
   const showBulkEnrolModal = useShowBulkEnrolModal();
   const showAssignInstructorModal = useShowAssignInstructorModal();
@@ -497,12 +500,24 @@ export default function TenantClassDetailContainer({
           </p>
         </div>
 
-        {hasPermission(PERMS.class.edit) && cls.status === 'ACTIVE' && (
-          <Button onClick={() => showClassModal(cls)} size="sm">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Section
-          </Button>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {hasPermission(PERMS.diary.create) && cls.status === 'ACTIVE' && (
+            <Button
+              variant="outline"
+              onClick={() => showDiaryModal(null, classId)}
+              size="sm"
+            >
+              <NotebookPen className="mr-2 h-4 w-4" />
+              New Diary Note
+            </Button>
+          )}
+          {hasPermission(PERMS.class.edit) && cls.status === 'ACTIVE' && (
+            <Button onClick={() => showClassModal(cls)} size="sm">
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Section
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Metadata Metrics Dashboard */}

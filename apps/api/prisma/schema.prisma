@@ -32,6 +32,7 @@ model Tenant {
   enrolments             Enrolment[]
   sessions               Session[]
   savedFilters           SavedFilter[]
+  diaries                Diary[]
   notices                Notice[]
   announcements          Announcement[]
 
@@ -78,6 +79,8 @@ model User {
   createdParents       ParentProfile[]  @relation("ParentCreatedBy")
   updatedParents       ParentProfile[]  @relation("ParentUpdatedBy")
   createdEnrolments    Enrolment[]      @relation("EnrolmentCreatedBy")
+  createdDiaries       Diary[]          @relation("DiaryCreatedBy")
+  updatedDiaries       Diary[]          @relation("DiaryUpdatedBy")
   savedFilters         SavedFilter[]
   createdNotices       Notice[]         @relation("NoticeCreatedBy")
   updatedNotices       Notice[]         @relation("NoticeUpdatedBy")
@@ -189,6 +192,7 @@ model AcademicTerm {
   creator User?   @relation("AcademicTermCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   updater User?   @relation("AcademicTermUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   classes Class[]
+  diaries Diary[]
 
   @@index([tenantId, name])
   @@map("academic_terms")
@@ -211,6 +215,7 @@ model Program {
   updater User?    @relation("ProgramUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   courses Course[]
   classes Class[]
+  diaries Diary[]
 
   @@unique([tenantId, code])
   @@map("programs")
@@ -235,6 +240,7 @@ model Course {
   creator               User?                   @relation("CourseCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   updater               User?                   @relation("CourseUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   instructorAssignments ClassInstructorCourse[]
+  diaries               Diary[]
 
   @@unique([tenantId, code])
   @@map("courses")
@@ -261,6 +267,7 @@ model Class {
   updater      User?             @relation("ClassUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   instructors  ClassInstructor[]
   enrolments   Enrolment[]
+  diaries      Diary[]
   notices      NoticeClass[]
 
   @@index([tenantId, academicTermId])
@@ -438,6 +445,37 @@ model SavedFilter {
 
   @@unique([tenantId, userId, feature, name])
   @@map("saved_filters")
+}
+
+// =====================================================
+// WORK DIARY
+// =====================================================
+model Diary {
+  id         String    @id @default(uuid()) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  termId     String    @map("term_id") @db.Uuid
+  programId  String    @map("program_id") @db.Uuid
+  classId    String    @map("class_id") @db.Uuid
+  courseId   String?   @map("course_id") @db.Uuid
+  note       String    @db.Text
+  studentIds String[]  @map("student_ids") @db.Uuid @default([])
+  createdBy  String?   @map("created_by") @db.Uuid
+  updatedBy  String?   @map("updated_by") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  term    AcademicTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+  program Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  class   Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  course  Course?      @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  creator User?        @relation("DiaryCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User?        @relation("DiaryUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, classId])
+  @@index([tenantId, termId])
+  @@map("diary")
 }
 
 // =====================================================

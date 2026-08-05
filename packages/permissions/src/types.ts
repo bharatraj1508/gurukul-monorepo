@@ -12,6 +12,7 @@ export type FeatureKey =
   | 'program'
   | 'course'
   | 'class'
+  | 'diary'
   | 'instructor'
   | 'student'
   | 'parent'

@@ -6,6 +6,7 @@ import { ModalPayload, ModalType } from '@/lib/store/types/modal';
 import { type AcademicTerm } from '@/services/api/requests/academic-terms';
 import { type Class } from '@/services/api/requests/classes';
 import { type Course } from '@/services/api/requests/courses';
+import { type Diary } from '@/services/api/requests/diary';
 import { type ParentListItem } from '@/services/api/requests/parents';
 import { type Program } from '@/services/api/requests/programs';
 import { type Role } from '@/services/api/requests/roles';
@@ -146,6 +147,15 @@ export function useShowClassModal() {
   return useCallback(
     (editingClass: Class | null) =>
       showModal(ModalType.ClassModal, { editingClass }),
+    [showModal],
+  );
+}
+
+export function useShowDiaryModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (editingDiary: Diary | null, presetClassId?: string) =>
+      showModal(ModalType.DiaryModal, { editingDiary, presetClassId }),
     [showModal],
   );
 }
