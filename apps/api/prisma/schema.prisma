@@ -34,6 +34,13 @@ model Tenant {
   savedFilters           SavedFilter[]
   notices                Notice[]
   announcements          Announcement[]
+  rooms                  Room[]
+  periodTemplates        PeriodTemplate[]
+  timetables             Timetable[]
+  timetableSlots         TimetableSlot[]
+  timetableSubstitutions TimetableSubstitution[]
+  teacherConstraints     TeacherConstraint[]
+  courseAllocations      CourseAllocation[]
 
   @@map("tenants")
 }
@@ -65,24 +72,37 @@ model User {
   assignedInstructorCourses ClassInstructorCourse[] @relation("InstructorCourseAssignedBy")
 
   // Audit Relations
-  createdAcademicTerms AcademicTerm[]   @relation("AcademicTermCreatedBy")
-  updatedAcademicTerms AcademicTerm[]   @relation("AcademicTermUpdatedBy")
-  createdPrograms      Program[]        @relation("ProgramCreatedBy")
-  updatedPrograms      Program[]        @relation("ProgramUpdatedBy")
-  createdCourses       Course[]         @relation("CourseCreatedBy")
-  updatedCourses       Course[]         @relation("CourseUpdatedBy")
-  createdClasses       Class[]          @relation("ClassCreatedBy")
-  updatedClasses       Class[]          @relation("ClassUpdatedBy")
-  createdStudents      StudentProfile[] @relation("StudentCreatedBy")
-  updatedStudents      StudentProfile[] @relation("StudentUpdatedBy")
-  createdParents       ParentProfile[]  @relation("ParentCreatedBy")
-  updatedParents       ParentProfile[]  @relation("ParentUpdatedBy")
-  createdEnrolments    Enrolment[]      @relation("EnrolmentCreatedBy")
-  savedFilters         SavedFilter[]
-  createdNotices       Notice[]         @relation("NoticeCreatedBy")
-  updatedNotices       Notice[]         @relation("NoticeUpdatedBy")
-  createdAnnouncements Announcement[]   @relation("AnnouncementCreatedBy")
-  approvedAnnouncements Announcement[]   @relation("AnnouncementApprovedBy")
+  createdAcademicTerms      AcademicTerm[]          @relation("AcademicTermCreatedBy")
+  updatedAcademicTerms      AcademicTerm[]          @relation("AcademicTermUpdatedBy")
+  createdPrograms           Program[]               @relation("ProgramCreatedBy")
+  updatedPrograms           Program[]               @relation("ProgramUpdatedBy")
+  createdCourses            Course[]                @relation("CourseCreatedBy")
+  updatedCourses            Course[]                @relation("CourseUpdatedBy")
+  createdClasses            Class[]                 @relation("ClassCreatedBy")
+  updatedClasses            Class[]                 @relation("ClassUpdatedBy")
+  createdStudents           StudentProfile[]        @relation("StudentCreatedBy")
+  updatedStudents           StudentProfile[]        @relation("StudentUpdatedBy")
+  createdParents            ParentProfile[]         @relation("ParentCreatedBy")
+  updatedParents            ParentProfile[]         @relation("ParentUpdatedBy")
+  createdEnrolments         Enrolment[]             @relation("EnrolmentCreatedBy")
+  savedFilters              SavedFilter[]
+  createdNotices            Notice[]                @relation("NoticeCreatedBy")
+  updatedNotices            Notice[]                @relation("NoticeUpdatedBy")
+  createdAnnouncements      Announcement[]          @relation("AnnouncementCreatedBy")
+  approvedAnnouncements     Announcement[]          @relation("AnnouncementApprovedBy")
+  createdRooms              Room[]                  @relation("RoomCreatedBy")
+  updatedRooms              Room[]                  @relation("RoomUpdatedBy")
+  createdPeriodTemplates    PeriodTemplate[]        @relation("PeriodTemplateCreatedBy")
+  updatedPeriodTemplates    PeriodTemplate[]        @relation("PeriodTemplateUpdatedBy")
+  createdTimetables         Timetable[]             @relation("TimetableCreatedBy")
+  updatedTimetables         Timetable[]             @relation("TimetableUpdatedBy")
+  publishedTimetables       Timetable[]             @relation("TimetablePublishedBy")
+  createdSubstitutions      TimetableSubstitution[] @relation("SubstitutionCreatedBy")
+  updatedSubstitutions      TimetableSubstitution[] @relation("SubstitutionUpdatedBy")
+  createdTeacherConstraints TeacherConstraint[]     @relation("TeacherConstraintCreatedBy")
+  updatedTeacherConstraints TeacherConstraint[]     @relation("TeacherConstraintUpdatedBy")
+  createdCourseAllocations  CourseAllocation[]      @relation("CourseAllocationCreatedBy")
+  updatedCourseAllocations  CourseAllocation[]      @relation("CourseAllocationUpdatedBy")
 
   @@map("users")
 }
@@ -106,15 +126,18 @@ model TenantMembership {
   updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
   deletedAt           DateTime? @map("deleted_at") @db.Timestamp(6)
 
-  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user             User              @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
-  invitedBy        User?             @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
-  creator          User?             @relation("MembershipCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  updater          User?             @relation("MembershipUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
-  roles            MembershipRole[]
-  classInstructors ClassInstructor[]
-  studentProfiles  StudentProfile[]
-  parentProfiles   ParentProfile[]
+  tenant            Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user              User                    @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy         User?                   @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  creator           User?                   @relation("MembershipCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updater           User?                   @relation("MembershipUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  roles             MembershipRole[]
+  classInstructors  ClassInstructor[]
+  studentProfiles   StudentProfile[]
+  parentProfiles    ParentProfile[]
+  taughtSlots       TimetableSlot[]         @relation("SlotTeacher")
+  substitutionsFor  TimetableSubstitution[] @relation("SubstituteTeacher")
+  teacherConstraint TeacherConstraint?
 
   @@unique([tenantId, userId])
   @@map("tenant_memberships")
@@ -185,10 +208,11 @@ model AcademicTerm {
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
 
-  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  creator User?   @relation("AcademicTermCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updater User?   @relation("AcademicTermUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-  classes Class[]
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator    User?       @relation("AcademicTermCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater    User?       @relation("AcademicTermUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  classes    Class[]
+  timetables Timetable[]
 
   @@index([tenantId, name])
   @@map("academic_terms")
@@ -235,6 +259,8 @@ model Course {
   creator               User?                   @relation("CourseCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   updater               User?                   @relation("CourseUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   instructorAssignments ClassInstructorCourse[]
+  timetableSlots        TimetableSlot[]
+  courseAllocations     CourseAllocation[]
 
   @@unique([tenantId, code])
   @@map("courses")
@@ -254,14 +280,16 @@ model Class {
   updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
   deletedAt      DateTime? @map("deleted_at") @db.Timestamp(6)
 
-  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  academicTerm AcademicTerm      @relation(fields: [academicTermId], references: [id], onDelete: Cascade)
-  program      Program           @relation(fields: [programId], references: [id], onDelete: Cascade)
-  creator      User?             @relation("ClassCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updater      User?             @relation("ClassUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-  instructors  ClassInstructor[]
-  enrolments   Enrolment[]
-  notices      NoticeClass[]
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  academicTerm      AcademicTerm       @relation(fields: [academicTermId], references: [id], onDelete: Cascade)
+  program           Program            @relation(fields: [programId], references: [id], onDelete: Cascade)
+  creator           User?              @relation("ClassCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater           User?              @relation("ClassUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  instructors       ClassInstructor[]
+  enrolments        Enrolment[]
+  notices           NoticeClass[]
+  timetableSlots    TimetableSlot[]
+  courseAllocations CourseAllocation[]
 
   @@index([tenantId, academicTermId])
   @@map("classes")
@@ -505,4 +533,217 @@ model Announcement {
 
   @@index([tenantId, status, startDate, endDate])
   @@map("announcements")
+}
+
+// =====================================================
+// TIMETABLES
+// =====================================================
+model Room {
+  id        String    @id @default(uuid()) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  name      String    @db.VarChar(100)
+  type      String    @default("CLASSROOM") @db.VarChar(50)
+  // type: CLASSROOM | SCIENCE_LAB | COMPUTER_LAB | SPORTS | AUDITORIUM | OTHER
+  capacity  Int
+  createdBy String?   @map("created_by") @db.Uuid
+  updatedBy String?   @map("updated_by") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator           User?              @relation("RoomCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater           User?              @relation("RoomUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  timetableSlots    TimetableSlot[]
+  courseAllocations CourseAllocation[]
+
+  @@unique([tenantId, name])
+  @@map("rooms")
+}
+
+model PeriodTemplate {
+  id          String    @id @default(uuid()) @db.Uuid
+  tenantId    String    @map("tenant_id") @db.Uuid
+  name        String    @db.VarChar(100)
+  workingDays Int[]     @map("working_days")
+  // workingDays: ISO weekday numbers, 1=Monday .. 7=Sunday
+  createdBy   String?   @map("created_by") @db.Uuid
+  updatedBy   String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant     Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator    User?                @relation("PeriodTemplateCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater    User?                @relation("PeriodTemplateUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  slots      PeriodTemplateSlot[]
+  timetables Timetable[]
+
+  @@unique([tenantId, name])
+  @@map("period_templates")
+}
+
+model PeriodTemplateSlot {
+  id               String   @id @default(uuid()) @db.Uuid
+  periodTemplateId String   @map("period_template_id") @db.Uuid
+  sortOrder        Int      @map("sort_order")
+  kind             String   @db.VarChar(20)
+  // kind: PERIOD | BREAK | ASSEMBLY | LUNCH
+  label            String?  @db.VarChar(100)
+  startTime        String   @map("start_time") @db.VarChar(5)
+  endTime          String   @map("end_time") @db.VarChar(5)
+  // startTime/endTime: "HH:mm" wall-clock, interpreted in the school's local time
+  periodNumber     Int?     @map("period_number")
+  // periodNumber: 1..N, present only when kind = PERIOD
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  template PeriodTemplate @relation(fields: [periodTemplateId], references: [id], onDelete: Cascade)
+
+  @@unique([periodTemplateId, sortOrder])
+  @@unique([periodTemplateId, periodNumber])
+  @@map("period_template_slots")
+}
+
+model Timetable {
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId         String    @map("tenant_id") @db.Uuid
+  academicTermId   String    @map("academic_term_id") @db.Uuid
+  periodTemplateId String    @map("period_template_id") @db.Uuid
+  name             String    @db.VarChar(150)
+  version          Int
+  status           String    @default("GENERATING") @db.VarChar(50)
+  // status: GENERATING | DRAFT | PUBLISHED | ARCHIVED | FAILED
+  jobId            String?   @map("job_id") @db.VarChar(100)
+  inputSnapshot    Json?     @map("input_snapshot") @db.JsonB
+  violations       Json?     @db.JsonB
+  failureHints     Json?     @map("failure_hints") @db.JsonB
+  solverStats      Json?     @map("solver_stats") @db.JsonB
+  publishedAt      DateTime? @map("published_at") @db.Timestamp(6)
+  publishedBy      String?   @map("published_by") @db.Uuid
+  archivedAt       DateTime? @map("archived_at") @db.Timestamp(6)
+  createdBy        String?   @map("created_by") @db.Uuid
+  updatedBy        String?   @map("updated_by") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt        DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  academicTerm   AcademicTerm    @relation(fields: [academicTermId], references: [id], onDelete: Cascade)
+  periodTemplate PeriodTemplate  @relation(fields: [periodTemplateId], references: [id])
+  creator        User?           @relation("TimetableCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater        User?           @relation("TimetableUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  publisher      User?           @relation("TimetablePublishedBy", fields: [publishedBy], references: [id], onDelete: SetNull)
+  slots          TimetableSlot[]
+
+  @@unique([tenantId, academicTermId, version])
+  @@index([tenantId, academicTermId, status])
+  @@map("timetables")
+}
+
+model TimetableSlot {
+  id                  String   @id @default(uuid()) @db.Uuid
+  tenantId            String   @map("tenant_id") @db.Uuid
+  timetableId         String   @map("timetable_id") @db.Uuid
+  classId             String   @map("class_id") @db.Uuid
+  dayOfWeek           Int      @map("day_of_week")
+  // dayOfWeek: ISO weekday, 1=Monday .. 7=Sunday
+  periodNumber        Int      @map("period_number")
+  courseId            String   @map("course_id") @db.Uuid
+  // Snapshot references: teacher/course are stored directly (not via ClassInstructorCourse)
+  // so published timetables survive instructor reassignments mid-term.
+  teacherMembershipId String?  @map("teacher_membership_id") @db.Uuid
+  roomId              String?  @map("room_id") @db.Uuid
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  tenant        Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  timetable     Timetable               @relation(fields: [timetableId], references: [id], onDelete: Cascade)
+  class         Class                   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  course        Course                  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacher       TenantMembership?       @relation("SlotTeacher", fields: [teacherMembershipId], references: [id], onDelete: SetNull)
+  room          Room?                   @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  substitutions TimetableSubstitution[]
+
+  @@unique([timetableId, classId, dayOfWeek, periodNumber])
+  @@unique([timetableId, teacherMembershipId, dayOfWeek, periodNumber])
+  @@unique([timetableId, roomId, dayOfWeek, periodNumber])
+  @@index([tenantId, timetableId, teacherMembershipId])
+  @@map("timetable_slots")
+}
+
+model TimetableSubstitution {
+  id                            String    @id @default(uuid()) @db.Uuid
+  tenantId                      String    @map("tenant_id") @db.Uuid
+  timetableSlotId               String    @map("timetable_slot_id") @db.Uuid
+  date                          DateTime  @db.Date
+  substituteTeacherMembershipId String    @map("substitute_teacher_membership_id") @db.Uuid
+  reason                        String?   @db.VarChar(255)
+  createdBy                     String?   @map("created_by") @db.Uuid
+  updatedBy                     String?   @map("updated_by") @db.Uuid
+  createdAt                     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt                     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  slot       TimetableSlot    @relation(fields: [timetableSlotId], references: [id], onDelete: Cascade)
+  substitute TenantMembership @relation("SubstituteTeacher", fields: [substituteTeacherMembershipId], references: [id], onDelete: Cascade)
+  creator    User?            @relation("SubstitutionCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater    User?            @relation("SubstitutionUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([timetableSlotId, date])
+  @@index([tenantId, date])
+  @@map("timetable_substitutions")
+}
+
+model TeacherConstraint {
+  id                    String    @id @default(uuid()) @db.Uuid
+  tenantId              String    @map("tenant_id") @db.Uuid
+  tenantMembershipId    String    @map("tenant_membership_id") @db.Uuid
+  maxPeriodsPerDay      Int?      @map("max_periods_per_day")
+  maxPeriodsPerWeek     Int?      @map("max_periods_per_week")
+  maxConsecutivePeriods Int?      @map("max_consecutive_periods")
+  availability          Json?     @db.JsonB
+  // availability: {"1": [1,2,3,8], ...} — allowed period numbers per ISO weekday; null = always available
+  createdBy             String?   @map("created_by") @db.Uuid
+  updatedBy             String?   @map("updated_by") @db.Uuid
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt             DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  membership TenantMembership @relation(fields: [tenantMembershipId], references: [id], onDelete: Cascade)
+  creator    User?            @relation("TeacherConstraintCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater    User?            @relation("TeacherConstraintUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([tenantMembershipId])
+  @@index([tenantId])
+  @@map("teacher_constraints")
+}
+
+model CourseAllocation {
+  id                   String    @id @default(uuid()) @db.Uuid
+  tenantId             String    @map("tenant_id") @db.Uuid
+  classId              String    @map("class_id") @db.Uuid
+  courseId             String    @map("course_id") @db.Uuid
+  periodsPerWeek       Int       @map("periods_per_week")
+  consecutiveBlockSize Int       @default(1) @map("consecutive_block_size")
+  roomId               String?   @map("room_id") @db.Uuid
+  roomType             String?   @map("room_type") @db.VarChar(50)
+  // roomId XOR roomType; both null = home classroom (no dedicated room needed)
+  createdBy            String?   @map("created_by") @db.Uuid
+  updatedBy            String?   @map("updated_by") @db.Uuid
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt            DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant  Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  room    Room?  @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  creator User?  @relation("CourseAllocationCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User?  @relation("CourseAllocationUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([classId, courseId])
+  @@index([tenantId, classId])
+  @@map("course_allocations")
 }

@@ -6,7 +6,9 @@ import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 
 import { DEFAULT_ROLES } from '@repo/permissions';
+
 import { seedNoticesAndAnnouncements } from './seeders/notices-announcements.seed';
+import { seedTimetables } from './seeders/timetable.seed';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -313,6 +315,15 @@ function makePhone(index: number): string {
 // ---------- Cleanup ----------
 
 async function cleanup(): Promise<void> {
+  await prisma.timetableSubstitution.deleteMany();
+  await prisma.timetableSlot.deleteMany();
+  await prisma.timetable.deleteMany();
+  await prisma.courseAllocation.deleteMany();
+  await prisma.teacherConstraint.deleteMany();
+  await prisma.periodTemplateSlot.deleteMany();
+  await prisma.periodTemplate.deleteMany();
+  await prisma.room.deleteMany();
+  await prisma.classInstructorCourse.deleteMany();
   await prisma.enrolment.deleteMany();
   await prisma.studentParent.deleteMany();
   await prisma.parentProfile.deleteMany();
@@ -951,6 +962,7 @@ async function main(): Promise<void> {
   );
 
   await seedNoticesAndAnnouncements(prisma);
+  await seedTimetables(prisma);
 
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
   console.log(

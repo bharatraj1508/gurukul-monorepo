@@ -19,6 +19,7 @@ import { roleFeature } from './role';
 import { studentFeature } from './student';
 import { teacherFeature } from './teacher';
 import { tenantFeature } from './tenant';
+import { timetableFeature } from './timetable';
 import { userFeature } from './user';
 
 // FEATURES — the source of truth that helpers iterate over.
@@ -44,6 +45,7 @@ export const FEATURES: Readonly<Record<FeatureKey, FeatureDefinition>> = {
   report: reportFeature,
   notice: noticeFeature,
   announcement: announcementFeature,
+  timetable: timetableFeature,
 };
 
 // Lookup helper used only by the PERMS facade below.
@@ -214,6 +216,14 @@ export const PERMS = {
     editOwn: p('announcement', 'edit-own-announcement'),
     deleteOwn: p('announcement', 'delete-own-announcement'),
     manage: p('announcement', 'manage-announcements'),
+  },
+  timetable: {
+    all: FEATURES.timetable.all,
+    view: p('timetable', 'view-timetables'),
+    viewOwn: p('timetable', 'view-own-timetable'),
+    manage: p('timetable', 'manage-timetables'),
+    generate: p('timetable', 'generate-timetables'),
+    publish: p('timetable', 'publish-timetables'),
   },
 } as const;
 

@@ -1,0 +1,3 @@
+bullmq==3.0.3
+ortools==9.14.6206
+redis==7.4.1  # hard-pinned by bullmq 3.0.3

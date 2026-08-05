@@ -32,6 +32,16 @@ export function useDummySidepane() {
   );
 }
 
+export function useShowTimetablePeriodSidepane() {
+  const show = useShowSidePane();
+  return useCallback(
+    (payload: SidePanePayloadMap[SidePaneType.TimetablePeriodSidepane]) => {
+      show(SidePaneType.TimetablePeriodSidepane, payload);
+    },
+    [show],
+  );
+}
+
 // Keep a backward compatible useSidepane wrapper for any legacy uses
 export function useSidepane() {
   const show = useShowSidePane();

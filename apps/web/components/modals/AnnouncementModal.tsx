@@ -1,35 +1,44 @@
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { toast } from 'sonner';
+import { Controller, useForm } from 'react-hook-form';
 
 import { Modal } from '@/components/modals/Modal';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { useShowApiError } from '@/hooks/api/use-show-api-error';
+import { useHideModal } from '@/hooks/use-modal';
 import {
   Announcement,
   useCreateAnnouncement,
   useUpdateAnnouncement,
 } from '@/services/api/requests/announcements';
-import { useShowApiError } from '@/hooks/api/use-show-api-error';
-import { useHideModal } from '@/hooks/use-modal';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 interface AnnouncementModalProps {
   editingAnnouncement?: Announcement | null;
 }
 
-export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementModalProps) {
+export function AnnouncementModal({
+  editingAnnouncement = null,
+}: AnnouncementModalProps) {
   const hideModal = useHideModal();
   const showError = useShowApiError();
 
-  const { mutateAsync: createAnnouncement, isPending: isCreating } = useCreateAnnouncement();
-  const { mutateAsync: updateAnnouncement, isPending: isUpdating } = useUpdateAnnouncement();
+  const { mutateAsync: createAnnouncement, isPending: isCreating } =
+    useCreateAnnouncement();
+  const { mutateAsync: updateAnnouncement, isPending: isUpdating } =
+    useUpdateAnnouncement();
 
   const formatDatetimeLocal = (isoString?: string) => {
     if (!isoString) return '';
@@ -56,7 +65,7 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
       {
         message: 'Start date is required for scheduled announcements',
         path: ['startDate'],
-      }
+      },
     )
     .refine(
       (data) => {
@@ -68,7 +77,7 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
       {
         message: 'End date must be after start date',
         path: ['endDate'],
-      }
+      },
     );
 
   type FormValues = z.infer<typeof formSchema>;
@@ -86,7 +95,9 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
         content: '',
         sendImmediately: true,
         startDate: formatDatetimeLocal(new Date().toISOString()),
-        endDate: formatDatetimeLocal(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()),
+        endDate: formatDatetimeLocal(
+          new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        ),
       };
 
   const {
@@ -110,7 +121,9 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
           dto: {
             title: data.title,
             content: data.content,
-            startDate: data.sendImmediately ? undefined : new Date(data.startDate!).toISOString(),
+            startDate: data.sendImmediately
+              ? undefined
+              : new Date(data.startDate!).toISOString(),
             endDate: new Date(data.endDate).toISOString(),
           },
         });
@@ -120,7 +133,9 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
           title: data.title,
           content: data.content,
           sendImmediately: data.sendImmediately,
-          startDate: data.sendImmediately ? undefined : new Date(data.startDate!).toISOString(),
+          startDate: data.sendImmediately
+            ? undefined
+            : new Date(data.startDate!).toISOString(),
           endDate: new Date(data.endDate).toISOString(),
         });
         toast.success('School announcement submitted for approval!');
@@ -137,7 +152,11 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
     <Modal
       isOpen={true}
       onClose={hideModal}
-      title={editingAnnouncement ? 'Edit School Announcement' : 'New School Announcement'}
+      title={
+        editingAnnouncement
+          ? 'Edit School Announcement'
+          : 'New School Announcement'
+      }
       description={
         editingAnnouncement
           ? 'Update announcement details.'
@@ -149,7 +168,10 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
         <FieldGroup>
           <Field>
             <FieldLabel>Announcement Title *</FieldLabel>
-            <Input placeholder="e.g. Annual Sports Day Celebration" {...register('title')} />
+            <Input
+              placeholder="e.g. Annual Sports Day Celebration"
+              {...register('title')}
+            />
             {errors.title && <FieldError>{errors.title.message}</FieldError>}
           </Field>
 
@@ -166,12 +188,14 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
                 />
               )}
             />
-            {errors.content && <FieldError>{errors.content.message}</FieldError>}
+            {errors.content && (
+              <FieldError>{errors.content.message}</FieldError>
+            )}
           </Field>
 
           <div className="border border-zinc-200 dark:border-zinc-800 rounded-md p-4 space-y-4 bg-zinc-50/50 dark:bg-zinc-900/20">
             <h4 className="text-sm font-semibold">Visibility Window</h4>
-            
+
             <Controller
               name="sendImmediately"
               control={control}
@@ -182,7 +206,10 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <Label htmlFor="sendImmediatelyAnn" className="font-medium cursor-pointer">
+                  <Label
+                    htmlFor="sendImmediatelyAnn"
+                    className="font-medium cursor-pointer"
+                  >
                     Publish immediately upon approval
                   </Label>
                 </div>
@@ -193,20 +220,18 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
               {!watchSendImmediately && (
                 <Field>
                   <FieldLabel>Publish Start Date</FieldLabel>
-                  <Input
-                    type="datetime-local"
-                    {...register('startDate')}
-                  />
-                  {errors.startDate && <FieldError>{errors.startDate.message}</FieldError>}
+                  <Input type="datetime-local" {...register('startDate')} />
+                  {errors.startDate && (
+                    <FieldError>{errors.startDate.message}</FieldError>
+                  )}
                 </Field>
               )}
               <Field>
                 <FieldLabel>Expiry Date (Valid Until)</FieldLabel>
-                <Input
-                  type="datetime-local"
-                  {...register('endDate')}
-                />
-                {errors.endDate && <FieldError>{errors.endDate.message}</FieldError>}
+                <Input type="datetime-local" {...register('endDate')} />
+                {errors.endDate && (
+                  <FieldError>{errors.endDate.message}</FieldError>
+                )}
               </Field>
             </div>
           </div>
@@ -217,7 +242,11 @@ export function AnnouncementModal({ editingAnnouncement = null }: AnnouncementMo
             Cancel
           </Button>
           <Button type="submit" disabled={isSaving}>
-            {isSaving ? 'Submitting...' : editingAnnouncement ? 'Save Changes' : 'Submit Announcement'}
+            {isSaving
+              ? 'Submitting...'
+              : editingAnnouncement
+                ? 'Save Changes'
+                : 'Submit Announcement'}
           </Button>
         </div>
       </form>

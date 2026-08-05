@@ -38,6 +38,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # Python CP-SAT timetable solver — consumes BullMQ jobs from Redis.
+  # Never touches Postgres; results return through the job's returnvalue.
+  solver:
+    image: ${SOLVER_IMAGE:-bharat1508/gurukul-solver:staging}
+    container_name: gurukul_solver
+    restart: always
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SOLVER_TIME_LIMIT_SECONDS=${SOLVER_TIME_LIMIT_SECONDS:-120}
+      - LOG_LEVEL=${SOLVER_LOG_LEVEL:-INFO}
+    depends_on:
+      redis:
+        condition: service_healthy
+
   # Next.js Frontend Web Service
   web:
     image: ${WEB_IMAGE:-bharat1508/gurukul-web:staging}

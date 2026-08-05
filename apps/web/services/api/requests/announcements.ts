@@ -55,11 +55,16 @@ export enum AnnouncementQueryKey {
   Detail = 'announcements:detail',
 }
 
-export function useAnnouncements(params?: { status?: string; active?: string }) {
+export function useAnnouncements(params?: {
+  status?: string;
+  active?: string;
+}) {
   return useQuery({
     queryKey: [AnnouncementQueryKey.List, params?.status, params?.active],
     queryFn: async () => {
-      const { data } = await axios.get<Announcement[]>('/announcements', { params });
+      const { data } = await axios.get<Announcement[]>('/announcements', {
+        params,
+      });
       return data;
     },
   });
@@ -84,7 +89,9 @@ export function useCreateAnnouncement() {
       return data;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.List] });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.List],
+      });
     },
   });
 }
@@ -93,12 +100,18 @@ export function useApproveAnnouncement() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await axios.patch<Announcement>(`/announcements/${id}/approve`);
+      const { data } = await axios.patch<Announcement>(
+        `/announcements/${id}/approve`,
+      );
       return data;
     },
     onSuccess: (data, id) => {
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.List] });
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.Detail, id] });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.List],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.Detail, id],
+      });
     },
   });
 }
@@ -106,13 +119,26 @@ export function useApproveAnnouncement() {
 export function useRejectAnnouncement() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, dto }: { id: string; dto: RejectAnnouncementDto }) => {
-      const { data } = await axios.patch<Announcement>(`/announcements/${id}/reject`, dto);
+    mutationFn: async ({
+      id,
+      dto,
+    }: {
+      id: string;
+      dto: RejectAnnouncementDto;
+    }) => {
+      const { data } = await axios.patch<Announcement>(
+        `/announcements/${id}/reject`,
+        dto,
+      );
       return data;
     },
     onSuccess: (data, { id }) => {
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.List] });
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.Detail, id] });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.List],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.Detail, id],
+      });
     },
   });
 }
@@ -120,13 +146,26 @@ export function useRejectAnnouncement() {
 export function useUpdateAnnouncement() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, dto }: { id: string; dto: UpdateAnnouncementDto }) => {
-      const { data } = await axios.patch<Announcement>(`/announcements/${id}`, dto);
+    mutationFn: async ({
+      id,
+      dto,
+    }: {
+      id: string;
+      dto: UpdateAnnouncementDto;
+    }) => {
+      const { data } = await axios.patch<Announcement>(
+        `/announcements/${id}`,
+        dto,
+      );
       return data;
     },
     onSuccess: (data, { id }) => {
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.List] });
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.Detail, id] });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.List],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.Detail, id],
+      });
     },
   });
 }
@@ -135,11 +174,15 @@ export function useDeleteAnnouncement() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await axios.delete<{ message: string }>(`/announcements/${id}`);
+      const { data } = await axios.delete<{ message: string }>(
+        `/announcements/${id}`,
+      );
       return data;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [AnnouncementQueryKey.List] });
+      void queryClient.invalidateQueries({
+        queryKey: [AnnouncementQueryKey.List],
+      });
     },
   });
 }

@@ -5,9 +5,14 @@ import { useAppSelector } from '@/lib/store';
 import { SidePaneType } from '@/lib/store/types/sidepane';
 
 import { DummySidepane } from './DummySidepane';
+import { TimetablePeriodSidepane } from './TimetablePeriodSidepane';
 
-const SIDEPANE_COMPONENTS = {
+// Registry: one line per sidepane. React.ComponentType<any> is intentional —
+// each sidepane narrows its own payload type internally (mirrors ModalDialog).
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const SIDEPANE_COMPONENTS: Record<SidePaneType, React.ComponentType<any>> = {
   [SidePaneType.DummySidepane]: DummySidepane,
+  [SidePaneType.TimetablePeriodSidepane]: TimetablePeriodSidepane,
 };
 
 export function SidepaneProvider() {

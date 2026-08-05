@@ -3,6 +3,9 @@
 import { Fragment } from 'react';
 
 import { AcademicTermModal } from '@/components/modals/AcademicTermModal';
+import { AnnouncementDetailModal } from '@/components/modals/AnnouncementDetailModal';
+import { AnnouncementModal } from '@/components/modals/AnnouncementModal';
+import { ApproveRejectAnnouncementModal } from '@/components/modals/ApproveRejectAnnouncementModal';
 import { AssignInstructorModal } from '@/components/modals/AssignInstructorModal';
 import { BulkEnrolModal } from '@/components/modals/BulkEnrolModal';
 import { BulkImportModal } from '@/components/modals/BulkImportModal';
@@ -13,23 +16,23 @@ import RevokeAccessModal from '@/components/modals/Confirmations/RevokeAccess';
 import SuspendMemberModal from '@/components/modals/Confirmations/SuspendMember';
 import { EditParentLinkModal } from '@/components/modals/EditParentLinkModal';
 import { EnrolStudentModal } from '@/components/modals/EnrolStudentModal';
+import { GenerateTimetableModal } from '@/components/modals/GenerateTimetableModal';
 import { InviteMemberModal } from '@/components/modals/InviteMemberModal';
 import { LinkParentModal } from '@/components/modals/LinkParentModal';
 import { ManageInstructorCoursesModal } from '@/components/modals/ManageInstructorCoursesModal';
 import { MemberProfileModal } from '@/components/modals/MemberProfileModal';
+import { NoticeDetailModal } from '@/components/modals/NoticeDetailModal';
+import { NoticeModal } from '@/components/modals/NoticeModal';
 import { ParentModal } from '@/components/modals/ParentModal';
 import { ParentProfileModal } from '@/components/modals/ParentProfileModal';
 import { ProgramModal } from '@/components/modals/ProgramModal';
 import { RoleModal } from '@/components/modals/RoleModal';
+import { RoomModal } from '@/components/modals/RoomModal';
 import { StudentModal } from '@/components/modals/StudentModal';
 import { StudentProfileModal } from '@/components/modals/StudentProfileModal';
 import { StudentStatusModal } from '@/components/modals/StudentStatusModal';
 import { TeacherProfileModal } from '@/components/modals/TeacherProfileModal';
-import { NoticeModal } from '@/components/modals/NoticeModal';
-import { NoticeDetailModal } from '@/components/modals/NoticeDetailModal';
-import { AnnouncementModal } from '@/components/modals/AnnouncementModal';
-import { AnnouncementDetailModal } from '@/components/modals/AnnouncementDetailModal';
-import { ApproveRejectAnnouncementModal } from '@/components/modals/ApproveRejectAnnouncementModal';
+import { TimetableSubstitutionModal } from '@/components/modals/TimetableSubstitutionModal';
 import { useModalPayload, useModalType } from '@/hooks/use-modal';
 import { ModalType } from '@/lib/store/types/modal';
 
@@ -71,6 +74,9 @@ const Modal: { [key in ModalType]?: React.ComponentType<any> } = {
   [ModalType.AnnouncementModal]: AnnouncementModal,
   [ModalType.AnnouncementDetailModal]: AnnouncementDetailModal,
   [ModalType.ApproveRejectAnnouncementModal]: ApproveRejectAnnouncementModal,
+  [ModalType.GenerateTimetableModal]: GenerateTimetableModal,
+  [ModalType.RoomModal]: RoomModal,
+  [ModalType.TimetableSubstitutionModal]: TimetableSubstitutionModal,
 };
 
 export default function ModalDialog() {

@@ -6,7 +6,11 @@ export type NoticeScope = 'CLASS' | 'TEACHERS_ONLY' | 'SCHOOL_WIDE';
 
 export interface NoticeClass {
   classId: string;
-  class: { id: string; name: string; program: { id: string; name: string; code: string } };
+  class: {
+    id: string;
+    name: string;
+    program: { id: string; name: string; code: string };
+  };
 }
 
 export interface NoticeCreator {
@@ -56,9 +60,18 @@ export enum NoticeQueryKey {
   Detail = 'notices:detail',
 }
 
-export function useNotices(params?: { scope?: string; classId?: string; active?: string }) {
+export function useNotices(params?: {
+  scope?: string;
+  classId?: string;
+  active?: string;
+}) {
   return useQuery({
-    queryKey: [NoticeQueryKey.List, params?.scope, params?.classId, params?.active],
+    queryKey: [
+      NoticeQueryKey.List,
+      params?.scope,
+      params?.classId,
+      params?.active,
+    ],
     queryFn: async () => {
       const { data } = await axios.get<Notice[]>('/notices', { params });
       return data;
@@ -99,7 +112,9 @@ export function useUpdateNotice() {
     },
     onSuccess: (data, { id }) => {
       void queryClient.invalidateQueries({ queryKey: [NoticeQueryKey.List] });
-      void queryClient.invalidateQueries({ queryKey: [NoticeQueryKey.Detail, id] });
+      void queryClient.invalidateQueries({
+        queryKey: [NoticeQueryKey.Detail, id],
+      });
     },
   });
 }
@@ -108,7 +123,9 @@ export function useDeleteNotice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await axios.delete<{ message: string }>(`/notices/${id}`);
+      const { data } = await axios.delete<{ message: string }>(
+        `/notices/${id}`,
+      );
       return data;
     },
     onSuccess: () => {

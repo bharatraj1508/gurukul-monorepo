@@ -18,6 +18,7 @@ export const hod: DefaultRoleDefinition = {
     PERMS.course.all.id,
     PERMS.class.all.id,
     PERMS.instructor.all.id,
+    PERMS.timetable.view.id,
     // People — view
     PERMS.student.view.id,
     PERMS.parent.view.id,

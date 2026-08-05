@@ -27,7 +27,8 @@ export type FeatureKey =
   | 'appearance'
   | 'report'
   | 'notice'
-  | 'announcement';
+  | 'announcement'
+  | 'timetable';
 
 // The bucket the role editor UI renders each feature into.
 export type EditorCategory =

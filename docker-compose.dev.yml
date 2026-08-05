@@ -48,5 +48,11 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
 
+  solver:
+    image: !reset null
+    build:
+      context: apps/solver
+      dockerfile: Dockerfile
+
 volumes:
   postgres_data:

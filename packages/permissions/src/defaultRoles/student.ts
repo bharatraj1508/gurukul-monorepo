@@ -13,6 +13,7 @@ export const studentRole: DefaultRoleDefinition = {
     // Academics — view own enrolled
     PERMS.course.viewOwn.id,
     PERMS.class.viewOwn.id,
+    PERMS.timetable.viewOwn.id,
     // People — view own profile
     PERMS.student.viewOwn.id,
     // Operations — view own

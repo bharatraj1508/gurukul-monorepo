@@ -26,10 +26,7 @@ import {
 } from '@/components/ui/table';
 import { useShowTeacherProfileModal } from '@/hooks/use-modal';
 import { useRequirePermission } from '@/hooks/use-require-permission';
-import {
-  TeacherListItem,
-  useTeachers,
-} from '@/services/api/requests/teachers';
+import { TeacherListItem, useTeachers } from '@/services/api/requests/teachers';
 import {
   ColumnDef,
   flexRender,
@@ -47,9 +44,9 @@ import {
   UserCheck,
 } from 'lucide-react';
 
-const TEACHER_STATUSES = ['INVITED', 'ACTIVE', 'SUSPENDED'];
-
 import { PERMS } from '@repo/permissions';
+
+const TEACHER_STATUSES = ['INVITED', 'ACTIVE', 'SUSPENDED'];
 
 export default function TeachersContainer() {
   const allowed = useRequirePermission({

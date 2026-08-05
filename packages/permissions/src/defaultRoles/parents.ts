@@ -12,6 +12,7 @@ export const parentsRole: DefaultRoleDefinition = {
     // People — view own profile + linked students
     PERMS.parent.viewOwn.id,
     PERMS.student.viewOwn.id,
+    PERMS.timetable.viewOwn.id,
     // Operations — view own linked
     PERMS.fee.viewOwn.id,
     PERMS.attendance.viewOwn.id,

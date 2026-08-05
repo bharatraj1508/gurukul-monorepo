@@ -44,6 +44,12 @@ services:
     networks:
       - default
 
+  # Solver only needs Redis on the default network; no ports, no DB access.
+  solver:
+    pull_policy: always
+    networks:
+      - default
+
 networks:
   # Verify on VPS with `docker network ls` — Compose v2 names this
   # `<project>_default`, but adjust here if Hostinger uses a different name.

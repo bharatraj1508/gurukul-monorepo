@@ -27,6 +27,7 @@ import { useCurrentUserProfile } from '@/services/api/requests/users';
 import {
   BellRing,
   Calendar,
+  CalendarClock,
   ChevronDown,
   ChevronRight,
   GraduationCap,
@@ -63,7 +64,19 @@ export function AppSidebar() {
     hasPermission(PERMS.course.view) || hasPermission(PERMS.course.viewOwn);
   const showClasses =
     hasPermission(PERMS.class.view) || hasPermission(PERMS.class.viewOwn);
-  const showAcademics = showTerms || showPrograms || showCourses || showClasses;
+  const showTimetableStudio =
+    hasPermission(PERMS.timetable.manage) ||
+    hasPermission(PERMS.timetable.generate) ||
+    hasPermission(PERMS.timetable.publish);
+  const showTimetableSetup = hasPermission(PERMS.timetable.manage);
+  const showMyTimetable = hasPermission(PERMS.timetable.viewOwn);
+  const showAcademics =
+    showTerms ||
+    showPrograms ||
+    showCourses ||
+    showClasses ||
+    showTimetableStudio ||
+    showTimetableSetup;
 
   const showNotices =
     hasPermission(PERMS.notice.createClass) ||
@@ -80,7 +93,8 @@ export function AppSidebar() {
 
   const [isErpOpen, setIsErpOpen] = useState(pathname.startsWith('/users'));
   const [isAcademicsOpen, setIsAcademicsOpen] = useState(
-    pathname.startsWith('/academics'),
+    pathname.startsWith('/academics') ||
+      pathname.startsWith('/academics/timetable'),
   );
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(
     pathname.startsWith('/notices') || pathname.startsWith('/announcements'),
@@ -124,6 +138,25 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* My Timetable Link */}
+          {showMyTimetable && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={
+                  pathname === '/timetable' ||
+                  pathname.startsWith('/timetable/')
+                }
+                className="w-full justify-start gap-3 transition-colors"
+              >
+                <Link href="/timetable">
+                  <CalendarClock className="h-4 w-4 shrink-0" />
+                  <span>My Timetable</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
 
           {/* Directory Collapsible Link */}
           {showDirectory && (
@@ -292,6 +325,38 @@ export function AppSidebar() {
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   )}
+                  {showTimetableStudio && (
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={
+                          pathname === '/academics/timetable' ||
+                          (pathname.startsWith('/academics/timetable/') &&
+                            !pathname.startsWith('/academics/timetable/setup'))
+                        }
+                        className="w-full justify-start gap-2 py-1 px-2 text-xs rounded-md cursor-pointer"
+                      >
+                        <Link href="/academics/timetable">
+                          <span>Timetable Studio</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  )}
+                  {showTimetableSetup && (
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={pathname.startsWith(
+                          '/academics/timetable/setup',
+                        )}
+                        className="w-full justify-start gap-2 py-1 px-2 text-xs rounded-md cursor-pointer"
+                      >
+                        <Link href="/academics/timetable/setup/rooms">
+                          <span>Timetable Setup</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  )}
                 </SidebarMenuSub>
               )}
             </SidebarMenuItem>
@@ -305,7 +370,9 @@ export function AppSidebar() {
                 className="w-full justify-start gap-3 transition-colors cursor-pointer"
               >
                 <Megaphone className="h-4 w-4 shrink-0" />
-                <span className="flex-1 text-left">Notices & Announcements</span>
+                <span className="flex-1 text-left">
+                  Notices & Announcements
+                </span>
                 {isCommunicationsOpen ? (
                   <ChevronDown className="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200" />
                 ) : (
@@ -319,7 +386,8 @@ export function AppSidebar() {
                       <SidebarMenuSubButton
                         asChild
                         isActive={
-                          pathname === '/notices' || pathname.startsWith('/notices/')
+                          pathname === '/notices' ||
+                          pathname.startsWith('/notices/')
                         }
                         className="w-full justify-start gap-2 py-1 px-2 text-xs rounded-md cursor-pointer"
                       >

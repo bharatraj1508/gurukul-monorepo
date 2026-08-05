@@ -13,6 +13,7 @@ export const classIncharge: DefaultRoleDefinition = {
     // Academics
     PERMS.course.view.id,
     PERMS.class.view.id,
+    PERMS.timetable.view.id,
     // People
     PERMS.student.view.id,
     PERMS.student.edit.id,

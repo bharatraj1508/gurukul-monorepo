@@ -1,21 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
 
 import { Modal } from '@/components/modals/Modal';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { RichTextContent } from '@/components/ui/rich-text-editor';
+import { useShowApiError } from '@/hooks/api/use-show-api-error';
+import { useHideModal } from '@/hooks/use-modal';
 import {
   Announcement,
   useApproveAnnouncement,
   useRejectAnnouncement,
 } from '@/services/api/requests/announcements';
-import { RichTextContent } from '@/components/ui/rich-text-editor';
-import { Calendar, User, Check, X } from 'lucide-react';
-import { useShowApiError } from '@/hooks/api/use-show-api-error';
-import { useHideModal } from '@/hooks/use-modal';
+import { format } from 'date-fns';
+import { Calendar, Check, User, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ApproveRejectAnnouncementModalProps {
   announcement?: Announcement | null;
@@ -31,8 +31,10 @@ export function ApproveRejectAnnouncementModal({
   const [rejectionReason, setRejectionReason] = useState('');
   const [reasonError, setReasonError] = useState('');
 
-  const { mutateAsync: approveAnnouncement, isPending: isApproving } = useApproveAnnouncement();
-  const { mutateAsync: rejectAnnouncement, isPending: isRejectingApi } = useRejectAnnouncement();
+  const { mutateAsync: approveAnnouncement, isPending: isApproving } =
+    useApproveAnnouncement();
+  const { mutateAsync: rejectAnnouncement, isPending: isRejectingApi } =
+    useRejectAnnouncement();
 
   if (!announcement) return null;
 
@@ -51,7 +53,9 @@ export function ApproveRejectAnnouncementModal({
 
   const handleRejectSubmit = async () => {
     if (!rejectionReason.trim()) {
-      setReasonError('Please provide a reason for rejecting this announcement.');
+      setReasonError(
+        'Please provide a reason for rejecting this announcement.',
+      );
       return;
     }
     try {
@@ -78,8 +82,10 @@ export function ApproveRejectAnnouncementModal({
     >
       <div className="space-y-4">
         <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-2">
-          <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-50">{announcement.title}</h3>
-          
+          <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-50">
+            {announcement.title}
+          </h3>
+
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-zinc-500">
             <div className="flex items-center gap-1">
               <User className="w-3.5 h-3.5" />
@@ -87,7 +93,10 @@ export function ApproveRejectAnnouncementModal({
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
-              <span>Active: {format(startDate, 'MMM d, yyyy')} &rarr; {format(endDate, 'MMM d, yyyy')}</span>
+              <span>
+                Active: {format(startDate, 'MMM d, yyyy')} &rarr;{' '}
+                {format(endDate, 'MMM d, yyyy')}
+              </span>
             </div>
           </div>
         </div>
@@ -98,7 +107,9 @@ export function ApproveRejectAnnouncementModal({
 
         {isRejecting && (
           <Field className="pt-2 animate-in fade-in duration-200">
-            <FieldLabel className="text-red-600 dark:text-red-400">Feedback / Rejection Reason *</FieldLabel>
+            <FieldLabel className="text-red-600 dark:text-red-400">
+              Feedback / Rejection Reason *
+            </FieldLabel>
             <textarea
               value={rejectionReason}
               onChange={(e) => {
@@ -137,7 +148,11 @@ export function ApproveRejectAnnouncementModal({
             </>
           ) : (
             <>
-              <Button variant="ghost" onClick={() => setIsRejecting(false)} disabled={isPending}>
+              <Button
+                variant="ghost"
+                onClick={() => setIsRejecting(false)}
+                disabled={isPending}
+              >
                 Back
               </Button>
               <Button

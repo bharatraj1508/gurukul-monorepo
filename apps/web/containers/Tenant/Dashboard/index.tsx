@@ -1,20 +1,31 @@
 'use client';
 
 import * as React from 'react';
+
 import Link from 'next/link';
-import { format } from 'date-fns';
-import { Sparkles, Megaphone, BellRing, ChevronRight, ArrowUpRight, User } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import {
-  useShowNoticeDetailModal,
   useShowAnnouncementDetailModal,
+  useShowNoticeDetailModal,
 } from '@/hooks/use-modal';
 import { useSubdomain } from '@/hooks/use-subdomain';
+import {
+  Announcement,
+  useAnnouncements,
+} from '@/services/api/requests/announcements';
+import { Notice, useNotices } from '@/services/api/requests/notices';
 import { useCurrentTenant } from '@/services/api/requests/tenants';
 import { useCurrentUserProfile } from '@/services/api/requests/users';
-import { useNotices, Notice } from '@/services/api/requests/notices';
-import { useAnnouncements, Announcement } from '@/services/api/requests/announcements';
+import { format } from 'date-fns';
+import {
+  ArrowUpRight,
+  BellRing,
+  ChevronRight,
+  Megaphone,
+  Sparkles,
+  User,
+} from 'lucide-react';
 
 export default function TenantDashboard() {
   const { subdomain } = useSubdomain();
@@ -25,14 +36,17 @@ export default function TenantDashboard() {
   const showAnnouncementDetailModal = useShowAnnouncementDetailModal();
 
   // Fetch active notices (limit to 2 for sidebar)
-  const { data: activeNotices, isLoading: isLoadingNotices } = useNotices({ active: 'true' });
+  const { data: activeNotices, isLoading: isLoadingNotices } = useNotices({
+    active: 'true',
+  });
   const recentNotices = activeNotices?.slice(0, 2) || [];
 
   // Fetch active approved announcements (limit to 2 for sidebar)
-  const { data: activeAnnouncements, isLoading: isLoadingAnnouncements } = useAnnouncements({
-    status: 'APPROVED',
-    active: 'true',
-  });
+  const { data: activeAnnouncements, isLoading: isLoadingAnnouncements } =
+    useAnnouncements({
+      status: 'APPROVED',
+      active: 'true',
+    });
   const recentAnnouncements = activeAnnouncements?.slice(0, 2) || [];
 
   const handleNoticeClick = (notice: Notice) => {
@@ -43,7 +57,8 @@ export default function TenantDashboard() {
     showAnnouncementDetailModal(announcement);
   };
 
-  const hasAnnouncements = isLoadingAnnouncements || recentAnnouncements.length > 0;
+  const hasAnnouncements =
+    isLoadingAnnouncements || recentAnnouncements.length > 0;
   const hasNotices = isLoadingNotices || recentNotices.length > 0;
   const hasRightSidebar = hasAnnouncements || hasNotices;
 
@@ -68,7 +83,13 @@ export default function TenantDashboard() {
       {/* Main Layout Grid with Right-hand Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column (Main Area) */}
-        <div className={hasRightSidebar ? 'lg:col-span-2 space-y-6' : 'lg:col-span-3 space-y-6'}>
+        <div
+          className={
+            hasRightSidebar
+              ? 'lg:col-span-2 space-y-6'
+              : 'lg:col-span-3 space-y-6'
+          }
+        >
           {/* Main workspace widgets can be rendered here */}
         </div>
 
@@ -116,7 +137,8 @@ export default function TenantDashboard() {
                             School Wide
                           </Badge>
                           <span className="text-[11px] text-zinc-400">
-                            Until {format(new Date(announcement.endDate), 'MMM d')}
+                            Until{' '}
+                            {format(new Date(announcement.endDate), 'MMM d')}
                           </span>
                         </div>
 
@@ -127,7 +149,9 @@ export default function TenantDashboard() {
                         <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-1">
                           <span className="truncate max-w-[130px] flex items-center gap-1">
                             <User className="h-3 w-3" />
-                            {announcement.creator ? announcement.creator.firstName : 'School'}
+                            {announcement.creator
+                              ? announcement.creator.firstName
+                              : 'School'}
                           </span>
                           <span className="text-amber-600 dark:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity font-medium flex items-center gap-0.5">
                             Read <ChevronRight className="h-3 w-3" />
@@ -192,7 +216,9 @@ export default function TenantDashboard() {
                         <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-1">
                           <span className="truncate max-w-[130px] flex items-center gap-1">
                             <User className="h-3 w-3" />
-                            {notice.creator ? notice.creator.firstName : 'Teacher'}
+                            {notice.creator
+                              ? notice.creator.firstName
+                              : 'Teacher'}
                           </span>
                           <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity font-medium flex items-center gap-0.5">
                             Read <ChevronRight className="h-3 w-3" />

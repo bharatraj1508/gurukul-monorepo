@@ -201,7 +201,8 @@ function TeacherRowActions({
 }) {
   const { hasPermission } = usePermission();
   const showDeleteModal = useShowDeleteModal();
-  const showManageInstructorCoursesModal = useShowManageInstructorCoursesModal();
+  const showManageInstructorCoursesModal =
+    useShowManageInstructorCoursesModal();
   const { mutateAsync: promote } = usePromoteInstructor();
   const { mutateAsync: remove } = useRemoveInstructor();
 

@@ -1,7 +1,7 @@
 name: Build and push images
 
 # Triggered on push to staging (main) or prod (production).
-# Builds api + web in parallel, pushes to Docker Hub, then SSH-deploys to VPS.
+# Builds api + web + solver in parallel, pushes to Docker Hub, then SSH-deploys to VPS.
 # Deploy is chained inside the same workflow (not a separate workflow_run)
 # so the "default branch quirk" of workflow_run doesn't silently skip deploys
 # when the default branch flips from main → production.
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: true # if one leg fails, cancel the other so :staging|:prod doesn't split-brain
       matrix:
-        app: [api, web]
+        app: [api, web, solver]
     permissions:
       contents: read
     outputs:
@@ -55,7 +55,8 @@ jobs:
       - name: Build & push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          # solver is a self-contained Python app; api/web need the monorepo root.
+          context: ${{ matrix.app == 'solver' && 'apps/solver' || '.' }}
           file: apps/${{ matrix.app }}/Dockerfile
           push: true
           tags: |

@@ -10,6 +10,7 @@ import * as path from 'path';
 import { Pool } from 'pg';
 
 import { AcademicTermsModule } from './academic-terms/academic-terms.module';
+import { AnnouncementsModule } from './announcements/announcements.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClassesModule } from './classes/classes.module';
@@ -20,15 +21,16 @@ import { CoursesModule } from './courses/courses.module';
 import { EnrolmentsModule } from './enrolments/enrolments.module';
 import { InstructorsModule } from './instructors/instructors.module';
 import { MembersModule } from './members/members.module';
+import { NoticesModule } from './notices/notices.module';
 import { ParentsModule } from './parents/parents.module';
 import { ProgramsModule } from './programs/programs.module';
 import { RolesModule } from './roles/roles.module';
+import { RoomsModule } from './rooms/rooms.module';
 import { SavedFiltersModule } from './saved-filters/saved-filters.module';
-import { NoticesModule } from './notices/notices.module';
-import { AnnouncementsModule } from './announcements/announcements.module';
 import { StudentsModule } from './students/students.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TenantsModule } from './tenants/tenants.module';
+import { TimetablesModule } from './timetables/timetables.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -97,6 +99,8 @@ import { UsersModule } from './users/users.module';
     SavedFiltersModule,
     NoticesModule,
     AnnouncementsModule,
+    RoomsModule,
+    TimetablesModule,
   ],
   controllers: [AppController],
   providers: [

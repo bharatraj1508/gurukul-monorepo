@@ -1,48 +1,52 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  useAnnouncements,
-  useDeleteAnnouncement,
-  Announcement,
-} from '@/services/api/requests/announcements';
-import { useCurrentUserProfile } from '@/services/api/requests/users';
-import { usePermission } from '@/hooks/use-permission';
-import {
-  useShowAnnouncementModal,
-  useShowAnnouncementDetailModal,
-  useShowApproveRejectAnnouncementModal,
-} from '@/hooks/use-modal';
-import { PERMS } from '@repo/permissions';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
-import {
-  Plus,
-  BellRing,
-  MoreVertical,
-  Edit,
-  Trash2,
-  Calendar,
-  User,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  ShieldAlert,
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  useShowAnnouncementDetailModal,
+  useShowAnnouncementModal,
+  useShowApproveRejectAnnouncementModal,
+} from '@/hooks/use-modal';
+import { usePermission } from '@/hooks/use-permission';
+import { cn } from '@/lib/utils';
+import {
+  Announcement,
+  useAnnouncements,
+  useDeleteAnnouncement,
+} from '@/services/api/requests/announcements';
+import { useCurrentUserProfile } from '@/services/api/requests/users';
+import { format } from 'date-fns';
+import {
+  BellRing,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Edit,
+  MoreVertical,
+  Plus,
+  ShieldAlert,
+  Trash2,
+  User,
+  XCircle,
+} from 'lucide-react';
 import { toast } from 'sonner';
+
+import { PERMS } from '@repo/permissions';
 
 export default function TenantAnnouncementsContainer() {
   const { hasPermission } = usePermission();
   const { data: profile } = useCurrentUserProfile();
-  const [activeTab, setActiveTab] = useState<'PUBLISHED' | 'APPROVAL_QUEUE' | 'MY_SUBMISSIONS'>('PUBLISHED');
+  const [activeTab, setActiveTab] = useState<
+    'PUBLISHED' | 'APPROVAL_QUEUE' | 'MY_SUBMISSIONS'
+  >('PUBLISHED');
 
   const showAnnouncementModal = useShowAnnouncementModal();
   const showDetailModal = useShowAnnouncementDetailModal();
@@ -75,7 +79,10 @@ export default function TenantAnnouncementsContainer() {
     showAnnouncementModal(announcement);
   };
 
-  const handleDelete = async (announcement: Announcement, e: React.MouseEvent) => {
+  const handleDelete = async (
+    announcement: Announcement,
+    e: React.MouseEvent,
+  ) => {
     e.stopPropagation();
     if (confirm('Are you sure you want to delete this announcement?')) {
       try {
@@ -111,7 +118,10 @@ export default function TenantAnnouncementsContainer() {
         </div>
 
         {canCreate && (
-          <Button onClick={handleCreate} className="gap-2 shrink-0 shadow-sm transition-all hover:shadow-md">
+          <Button
+            onClick={handleCreate}
+            className="gap-2 shrink-0 shadow-sm transition-all hover:shadow-md"
+          >
             <Plus className="h-4 w-4" />
             New Announcement
           </Button>
@@ -127,7 +137,7 @@ export default function TenantAnnouncementsContainer() {
               'px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap cursor-pointer',
               activeTab === 'PUBLISHED'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
           >
             Published Announcements
@@ -140,7 +150,7 @@ export default function TenantAnnouncementsContainer() {
                 'px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 cursor-pointer',
                 activeTab === 'APPROVAL_QUEUE'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >
               <span>Approval Queue</span>
@@ -155,7 +165,7 @@ export default function TenantAnnouncementsContainer() {
                 'px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap cursor-pointer',
                 activeTab === 'MY_SUBMISSIONS'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >
               My Submissions
@@ -187,11 +197,15 @@ export default function TenantAnnouncementsContainer() {
               {activeTab === 'APPROVAL_QUEUE'
                 ? 'All submitted announcements have been reviewed.'
                 : activeTab === 'MY_SUBMISSIONS'
-                ? 'You have not submitted any announcements.'
-                : 'There are currently no active school-wide announcements.'}
+                  ? 'You have not submitted any announcements.'
+                  : 'There are currently no active school-wide announcements.'}
             </p>
             {canCreate && (
-              <Button onClick={handleCreate} variant="outline" className="gap-2">
+              <Button
+                onClick={handleCreate}
+                variant="outline"
+                className="gap-2"
+              >
                 <Plus className="h-4 w-4" /> Submit Announcement
               </Button>
             )}
@@ -200,9 +214,12 @@ export default function TenantAnnouncementsContainer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {announcements.map((announcement) => {
               const statusColors = {
-                APPROVED: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400',
-                PENDING_APPROVAL: 'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400',
-                REJECTED: 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400',
+                APPROVED:
+                  'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400',
+                PENDING_APPROVAL:
+                  'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400',
+                REJECTED:
+                  'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400',
               };
 
               const StatusIcon = {
@@ -211,12 +228,17 @@ export default function TenantAnnouncementsContainer() {
                 REJECTED: XCircle,
               }[announcement.status];
 
-              const isOwner = !!announcement.createdBy && announcement.createdBy === profile?.id;
+              const isOwner =
+                !!announcement.createdBy &&
+                announcement.createdBy === profile?.id;
               const canEditAnnouncement =
-                canViewAll || (isOwner && hasPermission(PERMS.announcement.editOwn));
+                canViewAll ||
+                (isOwner && hasPermission(PERMS.announcement.editOwn));
               const canDeleteAnnouncement =
-                canViewAll || (isOwner && hasPermission(PERMS.announcement.deleteOwn));
-              const canManageAnnouncement = canEditAnnouncement || canDeleteAnnouncement;
+                canViewAll ||
+                (isOwner && hasPermission(PERMS.announcement.deleteOwn));
+              const canManageAnnouncement =
+                canEditAnnouncement || canDeleteAnnouncement;
 
               return (
                 <div
@@ -230,7 +252,7 @@ export default function TenantAnnouncementsContainer() {
                         variant="outline"
                         className={cn(
                           'border-none flex gap-1 text-[10px] font-semibold tracking-wider',
-                          statusColors[announcement.status]
+                          statusColors[announcement.status],
                         )}
                       >
                         <StatusIcon className="w-3 h-3" />
@@ -238,19 +260,23 @@ export default function TenantAnnouncementsContainer() {
                       </Badge>
 
                       <div className="flex items-center gap-1">
-                        {canApprove && announcement.status === 'PENDING_APPROVAL' && (
-                          <Button
-                            size="sm"
-                            onClick={(e) => handleReview(announcement, e)}
-                            className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white font-medium px-2.5 py-0"
-                          >
-                            Review
-                          </Button>
-                        )}
+                        {canApprove &&
+                          announcement.status === 'PENDING_APPROVAL' && (
+                            <Button
+                              size="sm"
+                              onClick={(e) => handleReview(announcement, e)}
+                              className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white font-medium px-2.5 py-0"
+                            >
+                              Review
+                            </Button>
+                          )}
 
                         {canManageAnnouncement && (
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenuTrigger
+                              asChild
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -261,7 +287,9 @@ export default function TenantAnnouncementsContainer() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-36">
                               {canEditAnnouncement && (
-                                <DropdownMenuItem onClick={(e) => handleEdit(announcement, e)}>
+                                <DropdownMenuItem
+                                  onClick={(e) => handleEdit(announcement, e)}
+                                >
                                   <Edit className="h-4 w-4 mr-2" /> Edit
                                 </DropdownMenuItem>
                               )}
@@ -283,11 +311,12 @@ export default function TenantAnnouncementsContainer() {
                       {announcement.title}
                     </h3>
 
-                    {announcement.status === 'REJECTED' && announcement.rejectionReason && (
-                      <p className="text-xs text-red-600 dark:text-red-400 italic line-clamp-2 mb-3 bg-red-50 dark:bg-red-950/30 p-2 rounded border border-red-200 dark:border-red-900">
-                        Reason: {announcement.rejectionReason}
-                      </p>
-                    )}
+                    {announcement.status === 'REJECTED' &&
+                      announcement.rejectionReason && (
+                        <p className="text-xs text-red-600 dark:text-red-400 italic line-clamp-2 mb-3 bg-red-50 dark:bg-red-950/30 p-2 rounded border border-red-200 dark:border-red-900">
+                          Reason: {announcement.rejectionReason}
+                        </p>
+                      )}
 
                     <div className="mt-auto pt-4 flex flex-col gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                       <div className="flex items-center gap-1.5">
@@ -302,7 +331,10 @@ export default function TenantAnnouncementsContainer() {
                         <Calendar className="h-3.5 w-3.5" />
                         <span>
                           {format(new Date(announcement.startDate), 'MMM d')} -{' '}
-                          {format(new Date(announcement.endDate), 'MMM d, yyyy')}
+                          {format(
+                            new Date(announcement.endDate),
+                            'MMM d, yyyy',
+                          )}
                         </span>
                       </div>
                     </div>
@@ -315,8 +347,8 @@ export default function TenantAnnouncementsContainer() {
                       announcement.status === 'APPROVED'
                         ? 'bg-emerald-500'
                         : announcement.status === 'PENDING_APPROVAL'
-                        ? 'bg-amber-500'
-                        : 'bg-red-500'
+                          ? 'bg-amber-500'
+                          : 'bg-red-500',
                     )}
                   />
                 </div>

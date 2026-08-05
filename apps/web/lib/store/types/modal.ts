@@ -1,16 +1,18 @@
+import { type GenerateTimetableDefaults } from '@/components/modals/GenerateTimetableModal';
 import { type AcademicTerm } from '@/services/api/requests/academic-terms';
+import { type Announcement } from '@/services/api/requests/announcements';
 import { type Class } from '@/services/api/requests/classes';
 import { type Course } from '@/services/api/requests/courses';
+import { type Notice } from '@/services/api/requests/notices';
 import { type ParentListItem } from '@/services/api/requests/parents';
 import { type Program } from '@/services/api/requests/programs';
 import { type Role } from '@/services/api/requests/roles';
+import { type Room } from '@/services/api/requests/rooms';
 import {
   type Student,
   type StudentListItem,
 } from '@/services/api/requests/students';
-
-import { type Notice } from '@/services/api/requests/notices';
-import { type Announcement } from '@/services/api/requests/announcements';
+import { type TimetableSubstitution } from '@/services/api/requests/timetable-config';
 
 // Add every modal you register, in declaration order.
 // `None` MUST be the first/zero value — it's the closed state.
@@ -46,6 +48,9 @@ export enum ModalType {
   AnnouncementModal,
   AnnouncementDetailModal,
   ApproveRejectAnnouncementModal,
+  GenerateTimetableModal,
+  RoomModal,
+  TimetableSubstitutionModal,
 }
 
 // Union of every modal's payload shape. Each member should ideally
@@ -94,6 +99,9 @@ export type ModalPayload =
   | { notice: Notice | null } // NoticeDetailModal
   | { editingAnnouncement: Announcement | null } // AnnouncementModal
   | { announcement: Announcement | null } // AnnouncementDetailModal / ApproveRejectAnnouncementModal Payload
+  | { generateDefaults: GenerateTimetableDefaults | null } // GenerateTimetableModal
+  | { editingRoom: Room | null } // RoomModal
+  | { editingSubstitution: TimetableSubstitution | null; defaultDate?: string }; // TimetableSubstitutionModal
 
 export type ModalState = {
   type: ModalType;

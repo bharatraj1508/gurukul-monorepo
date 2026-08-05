@@ -1,20 +1,23 @@
 import { useCallback } from 'react';
 
+import { type GenerateTimetableDefaults } from '@/components/modals/GenerateTimetableModal';
 import { useAppDispatch, useAppSelector } from '@/lib/store';
 import { actions } from '@/lib/store/slices/modal';
 import { ModalPayload, ModalType } from '@/lib/store/types/modal';
 import { type AcademicTerm } from '@/services/api/requests/academic-terms';
+import { type Announcement } from '@/services/api/requests/announcements';
 import { type Class } from '@/services/api/requests/classes';
 import { type Course } from '@/services/api/requests/courses';
+import { type Notice } from '@/services/api/requests/notices';
 import { type ParentListItem } from '@/services/api/requests/parents';
 import { type Program } from '@/services/api/requests/programs';
 import { type Role } from '@/services/api/requests/roles';
+import { type Room } from '@/services/api/requests/rooms';
 import {
   type Student,
   type StudentListItem,
 } from '@/services/api/requests/students';
-import { type Notice } from '@/services/api/requests/notices';
-import { type Announcement } from '@/services/api/requests/announcements';
+import { type TimetableSubstitution } from '@/services/api/requests/timetable-config';
 
 // Generic primitives — every per-modal hook below composes these.
 export function useShowModal() {
@@ -326,6 +329,39 @@ export function useShowApproveRejectAnnouncementModal() {
   return useCallback(
     (announcement: Announcement | null) =>
       showModal(ModalType.ApproveRejectAnnouncementModal, { announcement }),
+    [showModal],
+  );
+}
+
+export function useShowGenerateTimetableModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (generateDefaults: GenerateTimetableDefaults | null = null) =>
+      showModal(ModalType.GenerateTimetableModal, { generateDefaults }),
+    [showModal],
+  );
+}
+
+export function useShowRoomModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (editingRoom: Room | null = null) =>
+      showModal(ModalType.RoomModal, { editingRoom }),
+    [showModal],
+  );
+}
+
+export function useShowTimetableSubstitutionModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (
+      editingSubstitution: TimetableSubstitution | null = null,
+      defaultDate?: string,
+    ) =>
+      showModal(ModalType.TimetableSubstitutionModal, {
+        editingSubstitution,
+        defaultDate,
+      }),
     [showModal],
   );
 }
