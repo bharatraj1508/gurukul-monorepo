@@ -65,28 +65,33 @@ export function Modal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className={cn(
-          'gap-6 overflow-hidden rounded-xl bg-card border shadow-xl',
+          'flex flex-col max-h-[90vh] gap-0 overflow-hidden rounded-xl bg-card border shadow-xl p-6',
           SIZE_CLASSES[size],
           className,
         )}
       >
         {(title || description) && (
-          <DialogHeader className="space-y-1.5 pb-2 border-b">
+          <DialogHeader className="space-y-1.5 pb-4 border-b shrink-0">
             {title && (
               <DialogTitle className="text-lg font-semibold tracking-tight">
                 {title}
               </DialogTitle>
             )}
             {description && (
-              <DialogDescription className="text-sm text-muted-foreground">
-                {description}
+              <DialogDescription
+                className="text-sm text-muted-foreground"
+                asChild={typeof description !== 'string'}
+              >
+                {typeof description === 'string' ? description : <div>{description}</div>}
               </DialogDescription>
             )}
           </DialogHeader>
         )}
-        <div className="py-2 text-sm leading-relaxed">{children}</div>
+        <div className="py-4 text-sm leading-relaxed overflow-y-auto flex-1 max-h-[calc(90vh-10rem)] pr-1">
+          {children}
+        </div>
         {(footer || primaryAction || secondaryAction) && (
-          <DialogFooter className="pt-4 border-t gap-2 sm:gap-0">
+          <DialogFooter className="pt-4 border-t gap-2 sm:gap-0 shrink-0">
             {footer ? (
               footer
             ) : (
