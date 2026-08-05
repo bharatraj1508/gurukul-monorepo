@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Sparkles, Megaphone, BellRing, ChevronRight, ArrowUpRight, User } from 'lucide-react';
+import { Sparkles, Megaphone, BellRing, ChevronRight, ArrowUpRight, User, NotebookPen, Pencil, Plus, Trash2 } from 'lucide-react';
 
 
 
@@ -22,8 +22,8 @@ import {
 import { useCurrentTenant } from '@/services/api/requests/tenants';
 import { useCurrentUserProfile } from '@/services/api/requests/users';
 import { PERMS } from '@repo/permissions';
-import { NotebookPen, Pencil, Plus, useNotices, Notice } from '@/services/api/requests/notices';
-import { useAnnouncements, Announcement, Trash2 } from '@/services/api/requests/announcements';
+import {  useNotices, Notice } from '@/services/api/requests/notices';
+import { useAnnouncements, Announcement } from '@/services/api/requests/announcements';
 import { toast } from 'sonner';
 
 function WorkDiaryCard() {
