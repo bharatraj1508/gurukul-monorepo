@@ -2,3 +2,9 @@
 dist
 node_modules
 apps/web/next-env.d.ts
+
+# Python solver virtualenv + caches (apps/solver)
+.venv
+**/.venv/**
+**/__pycache__/**
+**/.pytest_cache/**
