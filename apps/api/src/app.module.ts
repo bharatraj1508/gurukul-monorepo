@@ -25,6 +25,8 @@ import { ParentsModule } from './parents/parents.module';
 import { ProgramsModule } from './programs/programs.module';
 import { RolesModule } from './roles/roles.module';
 import { SavedFiltersModule } from './saved-filters/saved-filters.module';
+import { NoticesModule } from './notices/notices.module';
+import { AnnouncementsModule } from './announcements/announcements.module';
 import { StudentsModule } from './students/students.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TenantsModule } from './tenants/tenants.module';
@@ -95,6 +97,8 @@ import { UsersModule } from './users/users.module';
     ParentsModule,
     TeachersModule,
     SavedFiltersModule,
+    NoticesModule,
+    AnnouncementsModule,
   ],
   controllers: [AppController],
   providers: [

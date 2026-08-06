@@ -21,7 +21,10 @@ export const studentRole: DefaultRoleDefinition = {
     PERMS.attendance.viewOwn.id,
     // Assessment — view own
     PERMS.grade.viewOwn.id,
+    // Announcements — view
+    PERMS.announcement.view.id,
     // Library — view catalog
     PERMS.library.view.id,
+    PERMS.notice.view.id,
   ],
 };

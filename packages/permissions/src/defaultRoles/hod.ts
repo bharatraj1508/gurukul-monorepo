@@ -27,11 +27,23 @@ export const hod: DefaultRoleDefinition = {
     PERMS.attendance.view.id,
     PERMS.attendance.mark.id,
     PERMS.attendance.edit.id,
+    // Announcements
+    PERMS.announcement.view.id,
+    PERMS.announcement.create.id,
+    PERMS.announcement.editOwn.id,
+    PERMS.announcement.deleteOwn.id,
     // Assessment
     PERMS.grade.view.id,
     PERMS.grade.enter.id,
     PERMS.grade.edit.id,
     // Library — view
     PERMS.library.view.id,
+    PERMS.notice.view.id,
+    PERMS.notice.viewAll.id,
+    PERMS.notice.createClass.id,
+    PERMS.notice.createTeacher.id,
+    PERMS.notice.editOwn.id,
+    PERMS.notice.deleteOwn.id,
+    PERMS.notice.manage.id,
   ],
 };

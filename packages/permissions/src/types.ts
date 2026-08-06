@@ -25,7 +25,9 @@ export type FeatureKey =
   | 'role'
   | 'tenant'
   | 'appearance'
-  | 'report';
+  | 'report'
+  | 'notice'
+  | 'announcement';
 
 // The bucket the role editor UI renders each feature into.
 export type EditorCategory =
@@ -55,7 +57,8 @@ export type IconName =
   | 'UserCog'
   | 'Shield'
   | 'Settings'
-  | 'BarChart3';
+  | 'BarChart3'
+  | 'Megaphone';
 
 // Classification used by the role editor and by view-scope detection.
 // 'view'      — read-all access for the entity

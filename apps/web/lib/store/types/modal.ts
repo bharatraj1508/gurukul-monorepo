@@ -9,6 +9,9 @@ import {
   type StudentListItem,
 } from '@/services/api/requests/students';
 
+import { type Notice } from '@/services/api/requests/notices';
+import { type Announcement } from '@/services/api/requests/announcements';
+
 // Add every modal you register, in declaration order.
 // `None` MUST be the first/zero value — it's the closed state.
 export enum ModalType {
@@ -38,6 +41,11 @@ export enum ModalType {
   LinkParentModal,
   EditParentLinkModal,
   TeacherProfileModal,
+  NoticeModal,
+  NoticeDetailModal,
+  AnnouncementModal,
+  AnnouncementDetailModal,
+  ApproveRejectAnnouncementModal,
 }
 
 // Union of every modal's payload shape. Each member should ideally
@@ -81,7 +89,11 @@ export type ModalPayload =
       subtitle: string;
       confirmButtonText?: string;
       onConfirm: () => void | Promise<void>;
-    }; // DeleteModal
+    } // DeleteModal
+  | { editingNotice: Notice | null } // NoticeModal
+  | { notice: Notice | null } // NoticeDetailModal
+  | { editingAnnouncement: Announcement | null } // AnnouncementModal
+  | { announcement: Announcement | null } // AnnouncementDetailModal / ApproveRejectAnnouncementModal Payload
 
 export type ModalState = {
   type: ModalType;

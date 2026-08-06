@@ -29,6 +29,12 @@ export const coordinators: DefaultRoleDefinition = {
     PERMS.fee.all.id,
     PERMS.attendance.all.id,
     PERMS.library.all.id,
+    // Announcements
+    PERMS.announcement.view.id,
+    PERMS.announcement.viewAll.id,
+    PERMS.announcement.create.id,
+    PERMS.announcement.editOwn.id,
+    PERMS.announcement.deleteOwn.id,
     // Assessment
     PERMS.grade.all.id,
     // Analytics
@@ -36,5 +42,6 @@ export const coordinators: DefaultRoleDefinition = {
     // Admin
     PERMS.role.view.id,
     PERMS.tenant.view.id,
+    PERMS.notice.all.id,
   ],
 };

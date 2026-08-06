@@ -1,5 +1,6 @@
 import { FeatureDefinition, FeatureKey, PermissionId } from '../types';
 import { academicTermFeature } from './academicTerm';
+import { announcementFeature } from './announcement';
 import { appearanceFeature } from './appearance';
 import { attendanceFeature } from './attendance';
 import { classFeature } from './class';
@@ -10,6 +11,7 @@ import { feeFeature } from './fee';
 import { gradeFeature } from './grade';
 import { instructorFeature } from './instructor';
 import { libraryFeature } from './library';
+import { noticeFeature } from './notice';
 import { parentFeature } from './parent';
 import { programFeature } from './program';
 import { reportFeature } from './report';
@@ -40,6 +42,8 @@ export const FEATURES: Readonly<Record<FeatureKey, FeatureDefinition>> = {
   tenant: tenantFeature,
   appearance: appearanceFeature,
   report: reportFeature,
+  notice: noticeFeature,
+  announcement: announcementFeature,
 };
 
 // Lookup helper used only by the PERMS facade below.
@@ -189,6 +193,27 @@ export const PERMS = {
   report: {
     all: FEATURES.report.all,
     view: p('report', 'view-reports'),
+  },
+  notice: {
+    all: FEATURES.notice.all,
+    view: p('notice', 'view-notices'),
+    viewAll: p('notice', 'view-all-notices'),
+    createClass: p('notice', 'create-class-notice'),
+    createTeacher: p('notice', 'create-teacher-notice'),
+    createSchool: p('notice', 'create-school-notice'),
+    editOwn: p('notice', 'edit-own-notice'),
+    deleteOwn: p('notice', 'delete-own-notice'),
+    manage: p('notice', 'manage-notices'),
+  },
+  announcement: {
+    all: FEATURES.announcement.all,
+    view: p('announcement', 'view-announcements'),
+    viewAll: p('announcement', 'view-all-announcements'),
+    create: p('announcement', 'create-announcement'),
+    approve: p('announcement', 'approve-announcement'),
+    editOwn: p('announcement', 'edit-own-announcement'),
+    deleteOwn: p('announcement', 'delete-own-announcement'),
+    manage: p('announcement', 'manage-announcements'),
   },
 } as const;
 

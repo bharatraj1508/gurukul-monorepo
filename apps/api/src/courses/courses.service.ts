@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,9 +10,37 @@ import { PrismaService } from 'nestjs-prisma';
 
 import { CreateCourseDto, UpdateCourseDto } from './dto';
 
+type ScopeContext = { scope: 'all' | 'own'; membershipId?: string };
+
 @Injectable()
 export class CoursesService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private async getStudentProgramIds(
+    tenantId: string,
+    membershipId?: string,
+  ): Promise<string[]> {
+    if (!membershipId) return [];
+
+    const studentProfile = await this.prisma.studentProfile.findFirst({
+      where: { tenantId, tenantMembershipId: membershipId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!studentProfile) return [];
+
+    const enrolments = await this.prisma.enrolment.findMany({
+      where: {
+        tenantId,
+        studentProfileId: studentProfile.id,
+        status: 'ACTIVE',
+        deletedAt: null,
+        class: { deletedAt: null },
+      },
+      select: { class: { select: { programId: true } } },
+    });
+
+    return [...new Set(enrolments.map((e) => e.class.programId))];
+  }
 
   async create(tenantId: string, userId: string, dto: CreateCourseDto) {
     // 1. Verify program exists and is not deleted
@@ -61,6 +90,7 @@ export class CoursesService {
   async findAll(
     tenantId: string,
     filters?: { programId?: string; search?: string },
+    scopeCtx?: ScopeContext,
   ) {
     const whereClause: Prisma.CourseWhereInput = {
       tenantId,
@@ -73,10 +103,23 @@ export class CoursesService {
         : filters.programId;
     }
 
+    if (scopeCtx?.scope === 'own') {
+      const programIds = await this.getStudentProgramIds(
+        tenantId,
+        scopeCtx.membershipId,
+      );
+      if (programIds.length === 0) return [];
+      whereClause.AND = [
+        ...(Array.isArray(whereClause.AND) ? whereClause.AND : []),
+        { programId: { in: programIds } },
+      ];
+    }
+
     if (filters?.search) {
       const search = filters.search.trim();
       if (search) {
         whereClause.AND = [
+          ...(Array.isArray(whereClause.AND) ? whereClause.AND : []),
           {
             OR: [
               { name: { contains: search, mode: 'insensitive' } },
@@ -118,7 +161,7 @@ export class CoursesService {
     });
   }
 
-  async findOne(tenantId: string, id: string) {
+  async findOne(tenantId: string, id: string, scopeCtx?: ScopeContext) {
     const course = await this.prisma.course.findFirst({
       where: {
         id,
@@ -163,6 +206,16 @@ export class CoursesService {
 
     if (!course) {
       throw new NotFoundException('Course not found');
+    }
+
+    if (scopeCtx?.scope === 'own') {
+      const programIds = await this.getStudentProgramIds(
+        tenantId,
+        scopeCtx.membershipId,
+      );
+      if (!programIds.includes(course.programId)) {
+        throw new ForbiddenException('You do not have access to this course.');
+      }
     }
 
     const teacherAssignments = await this.prisma.classInstructorCourse.findMany(

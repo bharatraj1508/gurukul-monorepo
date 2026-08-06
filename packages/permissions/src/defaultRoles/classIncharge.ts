@@ -32,5 +32,9 @@ export const classIncharge: DefaultRoleDefinition = {
     PERMS.grade.edit.id,
     // Library
     PERMS.library.view.id,
+    PERMS.notice.view.id,
+    PERMS.notice.createClass.id,
+    PERMS.notice.editOwn.id,
+    PERMS.notice.deleteOwn.id,
   ],
 };

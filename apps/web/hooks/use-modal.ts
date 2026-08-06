@@ -13,6 +13,8 @@ import {
   type Student,
   type StudentListItem,
 } from '@/services/api/requests/students';
+import { type Notice } from '@/services/api/requests/notices';
+import { type Announcement } from '@/services/api/requests/announcements';
 
 // Generic primitives — every per-modal hook below composes these.
 export function useShowModal() {
@@ -279,6 +281,51 @@ export function useShowEditParentLinkModal() {
         currentRelationship,
         currentDescription,
       }),
+    [showModal],
+  );
+}
+
+export function useShowNoticeModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (editingNotice: Notice | null = null) =>
+      showModal(ModalType.NoticeModal, { editingNotice }),
+    [showModal],
+  );
+}
+
+export function useShowNoticeDetailModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (notice: Notice | null) =>
+      showModal(ModalType.NoticeDetailModal, { notice }),
+    [showModal],
+  );
+}
+
+export function useShowAnnouncementModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (editingAnnouncement: Announcement | null = null) =>
+      showModal(ModalType.AnnouncementModal, { editingAnnouncement }),
+    [showModal],
+  );
+}
+
+export function useShowAnnouncementDetailModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (announcement: Announcement | null) =>
+      showModal(ModalType.AnnouncementDetailModal, { announcement }),
+    [showModal],
+  );
+}
+
+export function useShowApproveRejectAnnouncementModal() {
+  const showModal = useShowModal();
+  return useCallback(
+    (announcement: Announcement | null) =>
+      showModal(ModalType.ApproveRejectAnnouncementModal, { announcement }),
     [showModal],
   );
 }

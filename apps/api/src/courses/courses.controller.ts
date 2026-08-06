@@ -20,13 +20,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { PERMS } from '@repo/permissions';
+import { PERMS, getViewScope } from '@repo/permissions';
 
 import {
   GetCurrentTenant,
+  GetCurrentUser,
   GetCurrentUserId,
   RequirePermissions,
 } from '../common/decorators';
+import type { JwtPayloadWithRt } from '../users/types';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto';
 
@@ -56,12 +58,13 @@ export class CoursesController {
   }
 
   @Get()
-  @RequirePermissions(PERMS.course.view)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'List all courses',
+    summary: 'List courses',
     description:
-      'Returns all non-deleted courses for the current tenant, filterable by program.',
+      'Returns non-deleted courses for the current tenant, filterable by program. ' +
+      'Users with course.view see all courses; users with only course.viewOwn ' +
+      '(e.g. students) see only courses in the program(s) of their active class enrolments.',
   })
   @ApiQuery({
     name: 'programId',
@@ -79,29 +82,55 @@ export class CoursesController {
   @ApiForbiddenResponse({ description: 'Insufficient permissions.' })
   async findAll(
     @GetCurrentTenant('id') tenantId: string,
+    @GetCurrentUser() user: JwtPayloadWithRt,
     @Query('programId') programId?: string,
     @Query('search') search?: string,
   ) {
     if (!tenantId) throw new ForbiddenException('Tenant context required.');
-    return this.coursesService.findAll(tenantId, { programId, search });
+    const scope = getViewScope(user.scopes, 'course', {
+      isAdmin: user.isAdmin,
+    });
+    if (scope === 'none') {
+      throw new ForbiddenException(
+        'You do not have permission to view courses.',
+      );
+    }
+    return this.coursesService.findAll(
+      tenantId,
+      { programId, search },
+      { scope, membershipId: user.membershipId },
+    );
   }
 
   @Get(':id')
-  @RequirePermissions(PERMS.course.view)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get course details by ID',
     description:
-      'Returns details of a specific course, including program info.',
+      'Returns details of a specific course, including program info. ' +
+      'Users with only course.viewOwn can only access courses in the ' +
+      'program(s) of their active class enrolments.',
   })
   @ApiOkResponse({ description: 'Course details retrieved successfully.' })
   @ApiForbiddenResponse({ description: 'Insufficient permissions.' })
   async findOne(
     @GetCurrentTenant('id') tenantId: string,
+    @GetCurrentUser() user: JwtPayloadWithRt,
     @Param('id') id: string,
   ) {
     if (!tenantId) throw new ForbiddenException('Tenant context required.');
-    return this.coursesService.findOne(tenantId, id);
+    const scope = getViewScope(user.scopes, 'course', {
+      isAdmin: user.isAdmin,
+    });
+    if (scope === 'none') {
+      throw new ForbiddenException(
+        'You do not have permission to view courses.',
+      );
+    }
+    return this.coursesService.findOne(tenantId, id, {
+      scope,
+      membershipId: user.membershipId,
+    });
   }
 
   @Patch(':id')
