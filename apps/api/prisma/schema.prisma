@@ -19,7 +19,7 @@ model Tenant {
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
 
-  memberships            TenantMembership[]
+   memberships            TenantMembership[]
   roles                  Role[]
   academicTerms          AcademicTerm[]
   programs               Program[]
@@ -31,6 +31,7 @@ model Tenant {
   parentProfiles         ParentProfile[]
   enrolments             Enrolment[]
   sessions               Session[]
+  attendanceRecords      AttendanceRecord[]
   savedFilters           SavedFilter[]
   notices                Notice[]
   announcements          Announcement[]
@@ -78,6 +79,8 @@ model User {
   createdParents       ParentProfile[]  @relation("ParentCreatedBy")
   updatedParents       ParentProfile[]  @relation("ParentUpdatedBy")
   createdEnrolments    Enrolment[]      @relation("EnrolmentCreatedBy")
+  createdAttendanceRecords AttendanceRecord[] @relation("AttendanceRecordCreatedBy")
+  updatedAttendanceRecords AttendanceRecord[] @relation("AttendanceRecordUpdatedBy")
   savedFilters         SavedFilter[]
   createdNotices       Notice[]         @relation("NoticeCreatedBy")
   updatedNotices       Notice[]         @relation("NoticeUpdatedBy")
@@ -400,6 +403,7 @@ model Enrolment {
   student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   class   Class          @relation(fields: [classId], references: [id], onDelete: Cascade)
   creator User?          @relation("EnrolmentCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  attendanceRecords AttendanceRecord[]
 
   @@index([studentProfileId, classId, status])
   @@map("enrolments")
@@ -418,6 +422,32 @@ model Session {
 
   @@index([tenantId])
   @@map("sessions")
+}
+
+// =====================================================
+// ATTENDANCE
+// =====================================================
+model AttendanceRecord {
+  id          String    @id @default(uuid()) @db.Uuid
+  tenantId    String    @map("tenant_id") @db.Uuid
+  enrolmentId String    @map("enrolment_id") @db.Uuid
+  date        DateTime  @db.Date
+  status      String    @db.VarChar(50) // PRESENT, ABSENT, LEAVE
+  remark      String?   @db.VarChar(255)
+  createdBy   String?   @map("created_by") @db.Uuid
+  updatedBy   String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  enrolment Enrolment @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  creator   User?     @relation("AttendanceRecordCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater   User?     @relation("AttendanceRecordUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([enrolmentId, date])
+  @@index([tenantId, date])
+  @@map("attendance_records")
 }
 
 // =====================================================

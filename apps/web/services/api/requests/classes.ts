@@ -64,6 +64,13 @@ export interface Class {
   primaryInstructor: ClassInstructor | null;
   instructors?: ClassInstructor[];
   enrolledStudents?: ClassStudent[];
+  attendanceOverview?: {
+    present: number;
+    absent: number;
+    leave: number;
+    totalStudents: number;
+  };
+  averageAttendance?: number | null;
   createdAt: string;
   updatedAt: string;
   creator?: { id: string; firstName: string; lastName: string } | null;

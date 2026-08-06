@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useShowAssignInstructorModal,
   useShowBulkEnrolModal,
@@ -61,6 +62,8 @@ import {
 import { toast } from 'sonner';
 
 import { PERMS } from '@repo/permissions';
+
+import ClassAttendanceContainer from './ClassAttendanceContainer';
 
 function EnrolmentRowActions({
   enrolmentId,
@@ -505,324 +508,374 @@ export default function TenantClassDetailContainer({
         )}
       </div>
 
-      {/* Metadata Metrics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Capacity Utilization Card */}
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b pb-2 mb-3">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              Capacity Utilization
-            </span>
-            <Users className="h-4.5 w-4.5 text-zinc-400" />
-          </div>
-          <div className="flex items-end justify-between">
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50">
-                {cls.enrolledCount}
-              </span>
-              <span className="text-zinc-400 text-sm">
-                / {cls.maxCapacity} Seats
-              </span>
-            </div>
-            <span
-              className={`text-xs font-bold px-2 py-0.5 rounded ${
-                pct >= 90
-                  ? 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300'
-                  : pct >= 75
-                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
-                    : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-350'
-              }`}
-            >
-              {pct}% Filled
-            </span>
-          </div>
-          <div className="w-full h-2 bg-zinc-150 dark:bg-zinc-800 rounded-full overflow-hidden mt-4">
-            <div
-              className={`h-full rounded-full transition-all ${
-                pct >= 90
-                  ? 'bg-red-500'
-                  : pct >= 75
-                    ? 'bg-amber-500'
-                    : 'bg-emerald-500'
-              }`}
-              style={{ width: `${Math.min(pct, 100)}%` }}
-            />
-          </div>
-        </div>
+      <Tabs defaultValue="overview" className="flex flex-col w-full space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance</TabsTrigger>
+        </TabsList>
 
-        {/* Class Incharge Card */}
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b pb-2 mb-3">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              Class Incharge
-            </span>
-            <Info className="h-4.5 w-4.5 text-zinc-400" />
-          </div>
-          {classIncharge ? (
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center text-sm font-extrabold uppercase shrink-0">
-                {classIncharge.firstName.charAt(0)}
-              </div>
-              <div className="flex flex-col overflow-hidden">
-                <span className="font-bold text-sm text-zinc-900 dark:text-zinc-50 truncate">
-                  {classIncharge.firstName} {classIncharge.lastName}
+        <TabsContent value="overview" className="space-y-6 mt-0">
+          {/* Metadata Metrics Dashboard */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Capacity Utilization Card */}
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b pb-2 mb-3">
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Capacity Utilization
                 </span>
-                <span className="text-xs text-zinc-400 truncate">
-                  {classIncharge.email}
+                <Users className="h-4.5 w-4.5 text-zinc-400" />
+              </div>
+              <div className="flex items-end justify-between">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50">
+                    {cls.enrolledCount}
+                  </span>
+                  <span className="text-zinc-400 text-sm">
+                    / {cls.maxCapacity} Seats
+                  </span>
+                </div>
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded ${
+                    pct >= 90
+                      ? 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300'
+                      : pct >= 75
+                        ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
+                        : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-350'
+                  }`}
+                >
+                  {pct}% Filled
                 </span>
               </div>
+              <div className="w-full h-2 bg-zinc-150 dark:bg-zinc-800 rounded-full overflow-hidden mt-4">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    pct >= 90
+                      ? 'bg-red-500'
+                      : pct >= 75
+                        ? 'bg-amber-500'
+                        : 'bg-emerald-500'
+                  }`}
+                  style={{ width: `${Math.min(pct, 100)}%` }}
+                />
+              </div>
             </div>
-          ) : (
-            <span className="text-sm text-muted-foreground italic block">
-              No Class Incharge assigned.
-            </span>
-          )}
-          <div className="text-[10px] text-zinc-400 italic mt-2">
-            Responsible for managing general section activities.
-          </div>
-        </div>
 
-        {/* Audit Details Card */}
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b pb-2 mb-3">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              Audit Metadata
-            </span>
-            <Info className="h-4.5 w-4.5 text-zinc-400" />
-          </div>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between">
-              <span className="text-zinc-500 font-medium">Created By:</span>
-              <span className="text-zinc-900 dark:text-zinc-50 font-semibold truncate max-w-[120px]">
-                {cls.creator
-                  ? `${cls.creator.firstName} ${cls.creator.lastName.charAt(0)}.`
-                  : 'System'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-zinc-500 font-medium">Created At:</span>
-              <span className="text-zinc-900 dark:text-zinc-50 font-semibold">
-                {new Date(cls.createdAt).toLocaleDateString()}
-              </span>
-            </div>
-            <div className="flex justify-between border-t border-zinc-100 dark:border-zinc-900 pt-1 mt-1">
-              <span className="text-zinc-500 font-medium">Updated By:</span>
-              <span className="text-zinc-900 dark:text-zinc-50 font-semibold truncate max-w-[120px]">
-                {cls.updater
-                  ? `${cls.updater.firstName} ${cls.updater.lastName.charAt(0)}.`
-                  : 'System'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-zinc-500 font-medium">Updated At:</span>
-              <span className="text-zinc-900 dark:text-zinc-50 font-semibold">
-                {new Date(cls.updatedAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Grid Content: Left (Courses & Teachers), Right (Students) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 space-y-6">
-          {/* Courses List Card */}
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2 border-b pb-2">
-              <GraduationCap className="h-4.5 w-4.5 text-primary shrink-0" />
-              Subjects & Courses ({courses.length})
-            </h3>
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {courses.length === 0 ? (
-                <span className="text-xs text-muted-foreground italic block py-4 text-center">
-                  No courses linked to this Program.
+            {/* Class Incharge Card */}
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b pb-2 mb-3">
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Class Incharge
                 </span>
+                <Info className="h-4.5 w-4.5 text-zinc-400" />
+              </div>
+              {classIncharge ? (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center text-sm font-extrabold uppercase shrink-0">
+                    {classIncharge.firstName.charAt(0)}
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-50 truncate">
+                      {classIncharge.firstName} {classIncharge.lastName}
+                    </span>
+                    <span className="text-xs text-zinc-400 truncate">
+                      {classIncharge.email}
+                    </span>
+                  </div>
+                </div>
               ) : (
-                courses.map((course) => (
-                  <Link
-                    key={course.id}
-                    href={`/academics/courses/${course.id}`}
-                    className="p-2.5 border rounded-lg bg-zinc-50/50 dark:bg-zinc-900/10 flex flex-col gap-0.5 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-colors"
-                  >
-                    <span className="font-semibold text-xs text-primary hover:underline">
-                      {course.name}
-                    </span>
-                    <span className="text-[10px] text-zinc-400 font-mono font-medium">
-                      {course.code}{' '}
-                      {course.credits ? `• ${course.credits} Credits` : ''}
-                    </span>
-                  </Link>
-                ))
+                <span className="text-sm text-muted-foreground italic block">
+                  No Class Incharge assigned.
+                </span>
               )}
+              <div className="text-[10px] text-zinc-400 italic mt-2">
+                Responsible for managing general section activities.
+              </div>
+            </div>
+
+            {/* Average Attendance Card */}
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b pb-2 mb-3">
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Avg. Attendance
+                </span>
+                <Info className="h-4.5 w-4.5 text-zinc-400" />
+              </div>
+              <div className="flex items-end h-full mt-2">
+                <span className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-50">
+                  {cls.averageAttendance !== null &&
+                  cls.averageAttendance !== undefined
+                    ? `${cls.averageAttendance}%`
+                    : '—'}
+                </span>
+              </div>
+              <div className="text-[10px] text-zinc-400 italic mt-2">
+                Since term start.
+              </div>
             </div>
           </div>
 
-          {/* Assigned Teachers Card */}
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                <Users className="h-4.5 w-4.5 text-primary shrink-0" />
-                Assigned Teachers ({instructors.length})
-              </h3>
-              {hasPermission(PERMS.instructor.assign) &&
-                cls.status === 'ACTIVE' && (
-                  <Button
-                    size="sm"
-                    onClick={() => showAssignInstructorModal(classId)}
-                    className="h-7 text-[10px] font-bold px-2.5"
-                  >
-                    Assign
-                  </Button>
-                )}
-            </div>
-            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-              {instructors.length === 0 ? (
-                <span className="text-xs text-muted-foreground italic block py-4 text-center">
-                  No teachers assigned.
+          {/* Attendance & Engagement Row */}
+          <div className="w-full">
+            {/* Today's Attendance Overview Card */}
+            <div className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b pb-2 mb-3">
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Today's Attendance Overview
                 </span>
-              ) : (
-                instructors.map((teacher) => (
-                  <div
-                    key={teacher.membershipId}
-                    className="flex items-center justify-between p-2 rounded-lg border hover:bg-zinc-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5 overflow-hidden">
-                      <div className="h-7 w-7 rounded-full bg-zinc-100 dark:bg-zinc-800 border flex items-center justify-center text-[10px] font-bold uppercase shrink-0">
-                        {teacher.firstName.charAt(0)}
-                      </div>
-                      <div className="flex flex-col overflow-hidden">
-                        <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-150 truncate">
-                          {teacher.firstName} {teacher.lastName}
-                        </span>
-                        <span className="text-[9px] text-zinc-400 truncate">
-                          {teacher.email}
-                        </span>
-                        <span className="text-[9px] truncate">
-                          {teacher.courses.length === 0 ? (
-                            <span className="text-zinc-400 italic">
-                              No course assigned
-                            </span>
-                          ) : (
-                            teacher.courses.map((course, idx) => (
-                              <span key={course.id}>
-                                {idx > 0 && (
-                                  <span className="text-zinc-400">, </span>
-                                )}
-                                <Link
-                                  href={`/academics/courses/${course.id}`}
-                                  className="text-primary hover:underline"
-                                >
-                                  {course.name}
-                                </Link>
-                              </span>
-                            ))
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold border uppercase shrink-0 ${
-                          teacher.isPrimary
-                            ? 'bg-primary/10 text-primary border-primary/20'
-                            : 'bg-zinc-50 text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800'
-                        }`}
+                <Users className="h-4.5 w-4.5 text-zinc-400" />
+              </div>
+              <div className="grid grid-cols-4 gap-4 mt-2">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">
+                    Present
+                  </span>
+                  <span className="text-2xl font-extrabold text-emerald-600">
+                    {cls.attendanceOverview?.present || 0}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">
+                    Absent
+                  </span>
+                  <span className="text-2xl font-extrabold text-red-600">
+                    {cls.attendanceOverview?.absent || 0}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">
+                    Leave
+                  </span>
+                  <span className="text-2xl font-extrabold text-amber-600">
+                    {cls.attendanceOverview?.leave || 0}
+                  </span>
+                </div>
+                <div className="flex flex-col border-l pl-4 border-zinc-100 dark:border-zinc-800">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">
+                    Total Students
+                  </span>
+                  <span className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-50">
+                    {cls.attendanceOverview?.totalStudents || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Main Grid Content: Left (Courses & Teachers), Right (Students) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              {/* Courses List Card */}
+              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-4">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2 border-b pb-2">
+                  <GraduationCap className="h-4.5 w-4.5 text-primary shrink-0" />
+                  Subjects & Courses ({courses.length})
+                </h3>
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {courses.length === 0 ? (
+                    <span className="text-xs text-muted-foreground italic block py-4 text-center">
+                      No courses linked to this Program.
+                    </span>
+                  ) : (
+                    courses.map((course) => (
+                      <div
+                        key={course.id}
+                        className="p-2.5 border rounded-lg bg-zinc-50/50 dark:bg-zinc-900/10 flex flex-col gap-0.5 hover:bg-zinc-50 transition-colors"
                       >
-                        {teacher.isPrimary ? 'Class Incharge' : 'Teacher'}
-                      </span>
-                      <TeacherRowActions
-                        teacher={teacher}
-                        classId={classId}
-                        instructorsCount={instructors.length}
-                      />
+                        <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-150">
+                          {course.name}
+                        </span>
+                        <span className="text-[10px] text-zinc-400 font-mono font-medium">
+                          {course.code}{' '}
+                          {course.credits ? `• ${course.credits} Credits` : ''}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Assigned Teachers Card */}
+              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+                    <Users className="h-4.5 w-4.5 text-primary shrink-0" />
+                    Assigned Teachers ({instructors.length})
+                  </h3>
+                  {hasPermission(PERMS.instructor.assign) &&
+                    cls.status === 'ACTIVE' && (
+                      <Button
+                        size="sm"
+                        onClick={() => showAssignInstructorModal(classId)}
+                        className="h-7 text-[10px] font-bold px-2.5"
+                      >
+                        Assign
+                      </Button>
+                    )}
+                </div>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                  {instructors.length === 0 ? (
+                    <span className="text-xs text-muted-foreground italic block py-4 text-center">
+                      No teachers assigned.
+                    </span>
+                  ) : (
+                    instructors.map((teacher) => (
+                      <div
+                        key={teacher.membershipId}
+                        className="flex items-center justify-between p-2 rounded-lg border hover:bg-zinc-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                          <div className="h-7 w-7 rounded-full bg-zinc-100 dark:bg-zinc-800 border flex items-center justify-center text-[10px] font-bold uppercase shrink-0">
+                            {teacher.firstName.charAt(0)}
+                          </div>
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-150 truncate">
+                              {teacher.firstName} {teacher.lastName}
+                            </span>
+                            <span className="text-[9px] text-zinc-400 truncate">
+                              {teacher.email}
+                            </span>
+                            <span className="text-[9px] truncate mt-0.5">
+                              {teacher.courses.length === 0 ? (
+                                <span className="text-zinc-400 italic">
+                                  No course assigned
+                                </span>
+                              ) : (
+                                teacher.courses.map((course, idx) => (
+                                  <span key={course.id}>
+                                    {idx > 0 && (
+                                      <span className="text-zinc-400">, </span>
+                                    )}
+                                    <Link
+                                      href={`/academics/courses/${course.id}`}
+                                      className="text-primary hover:underline"
+                                    >
+                                      {course.name}
+                                    </Link>
+                                  </span>
+                                ))
+                              )}
+                            </span>
+                            <span className="text-[8px] text-zinc-400 truncate mt-0.5">
+                              Assigned{' '}
+                              {teacher.assignedAt
+                                ? new Date(
+                                    teacher.assignedAt,
+                                  ).toLocaleDateString()
+                                : 'N/A'}{' '}
+                              by{' '}
+                              {teacher.assignedBy
+                                ? `${teacher.assignedBy.firstName} ${teacher.assignedBy.lastName.charAt(0)}.`
+                                : 'System'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[9px] font-bold border uppercase shrink-0 ${
+                              teacher.isPrimary
+                                ? 'bg-primary/10 text-primary border-primary/20'
+                                : 'bg-zinc-50 text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800'
+                            }`}
+                          >
+                            {teacher.isPrimary ? 'Class Incharge' : 'Teacher'}
+                          </span>
+                          <TeacherRowActions
+                            teacher={teacher}
+                            classId={classId}
+                            instructorsCount={instructors.length}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Enrolled Students Table Card */}
+            <div className="lg:col-span-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col">
+              <div className="flex items-center justify-between border-b pb-2 mb-3 shrink-0">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+                  <Users className="h-4.5 w-4.5 text-primary shrink-0" />
+                  Enrolled Students ({cls.enrolledStudents?.length || 0})
+                </h3>
+                {hasPermission(PERMS.enrolment.create) &&
+                  cls.status === 'ACTIVE' && (
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => showBulkEnrolModal(classId)}
+                        className="h-8 text-xs font-semibold"
+                      >
+                        Bulk Enrol
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => showEnrolStudentModal(classId)}
+                        className="h-8 text-xs font-semibold"
+                      >
+                        Enrol Student
+                      </Button>
                     </div>
-                  </div>
-                ))
+                  )}
+              </div>
+
+              {!cls.enrolledStudents || cls.enrolledStudents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-center flex-1">
+                  <Users className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mb-2" />
+                  <span className="text-xs font-semibold">
+                    No students enrolled
+                  </span>
+                  <span className="text-[10px] text-zinc-400 mt-0.5">
+                    Students can be enrolled in this section from the student
+                    database.
+                  </span>
+                </div>
+              ) : (
+                <div className="overflow-hidden border border-zinc-200 dark:border-zinc-800 rounded-lg flex-1 min-h-0 overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody>
+                      {table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Enrolled Students Table Card */}
-        <div className="lg:col-span-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-4 flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                <Users className="h-4.5 w-4.5 text-primary shrink-0" />
-                Enrolled Students ({cls.enrolledStudents?.length || 0})
-              </h3>
-              {hasPermission(PERMS.enrolment.create) &&
-                cls.status === 'ACTIVE' && (
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => showBulkEnrolModal(classId)}
-                      className="h-8 text-xs font-semibold"
-                    >
-                      Bulk Enrol
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => showEnrolStudentModal(classId)}
-                      className="h-8 text-xs font-semibold"
-                    >
-                      Enrol Student
-                    </Button>
-                  </div>
-                )}
-            </div>
-
-            {!cls.enrolledStudents || cls.enrolledStudents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-center">
-                <Users className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mb-2" />
-                <span className="text-xs font-semibold">
-                  No students enrolled
-                </span>
-                <span className="text-[10px] text-zinc-400 mt-0.5">
-                  Students can be enrolled in this section from the student
-                  database.
-                </span>
-              </div>
-            ) : (
-              <div className="overflow-hidden border border-zinc-200 dark:border-zinc-800 rounded-lg max-h-96 overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead key={header.id}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+        </TabsContent>
+        <TabsContent value="attendance" className="space-y-6 mt-0">
+          <ClassAttendanceContainer classId={classId} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

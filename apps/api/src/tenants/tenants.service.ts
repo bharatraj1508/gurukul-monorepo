@@ -260,7 +260,7 @@ export class TenantsService {
       tenant.settings &&
       typeof tenant.settings === 'object' &&
       !Array.isArray(tenant.settings)
-        ? { ...(tenant.settings as Prisma.JsonObject) }
+        ? { ...tenant.settings }
         : {};
 
     const theme = this.toStoredTheme(dto);
@@ -268,7 +268,7 @@ export class TenantsService {
 
     await this.prisma.tenant.update({
       where: { id: tenantId },
-      data: { settings: settings as Prisma.InputJsonObject },
+      data: { settings: settings },
     });
     await this.invalidateTenantCache(subdomain);
 
@@ -298,11 +298,11 @@ export class TenantsService {
     if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
       return null;
     }
-    const theme = (settings as Prisma.JsonObject).theme;
+    const theme = settings.theme;
     if (!theme || typeof theme !== 'object' || Array.isArray(theme)) {
       return null;
     }
-    const { preset, radius, font, size } = theme as Prisma.JsonObject;
+    const { preset, radius, font, size } = theme;
     if (
       typeof preset !== 'string' ||
       typeof radius !== 'number' ||
