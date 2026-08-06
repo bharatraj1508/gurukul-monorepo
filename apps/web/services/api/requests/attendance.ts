@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { ClassQueryKey } from './classes';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,6 +94,9 @@ export function useSaveAttendance() {
           variables.classId,
           variables.dto.date,
         ],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [ClassQueryKey.Detail, variables.classId],
       });
     },
   });

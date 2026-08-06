@@ -508,7 +508,7 @@ export default function TenantClassDetailContainer({
         )}
       </div>
 
-      <Tabs defaultValue="overview" className="w-full space-y-6">
+      <Tabs defaultValue="overview" className="flex flex-col w-full space-y-6">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="attendance">Attendance</TabsTrigger>
@@ -592,51 +592,32 @@ export default function TenantClassDetailContainer({
               </div>
             </div>
 
-            {/* Audit Details Card */}
+            {/* Average Attendance Card */}
             <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between border-b pb-2 mb-3">
                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                  Audit Metadata
+                  Avg. Attendance
                 </span>
                 <Info className="h-4.5 w-4.5 text-zinc-400" />
               </div>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500 font-medium">Created By:</span>
-                  <span className="text-zinc-900 dark:text-zinc-50 font-semibold truncate max-w-[120px]">
-                    {cls.creator
-                      ? `${cls.creator.firstName} ${cls.creator.lastName.charAt(0)}.`
-                      : 'System'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500 font-medium">Created At:</span>
-                  <span className="text-zinc-900 dark:text-zinc-50 font-semibold">
-                    {new Date(cls.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex justify-between border-t border-zinc-100 dark:border-zinc-900 pt-1 mt-1">
-                  <span className="text-zinc-500 font-medium">Updated By:</span>
-                  <span className="text-zinc-900 dark:text-zinc-50 font-semibold truncate max-w-[120px]">
-                    {cls.updater
-                      ? `${cls.updater.firstName} ${cls.updater.lastName.charAt(0)}.`
-                      : 'System'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500 font-medium">Updated At:</span>
-                  <span className="text-zinc-900 dark:text-zinc-50 font-semibold">
-                    {new Date(cls.updatedAt).toLocaleDateString()}
-                  </span>
-                </div>
+              <div className="flex items-end h-full mt-2">
+                <span className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-50">
+                  {cls.averageAttendance !== null &&
+                  cls.averageAttendance !== undefined
+                    ? `${cls.averageAttendance}%`
+                    : '—'}
+                </span>
+              </div>
+              <div className="text-[10px] text-zinc-400 italic mt-2">
+                Since term start.
               </div>
             </div>
           </div>
 
           {/* Attendance & Engagement Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div className="w-full">
             {/* Today's Attendance Overview Card */}
-            <div className="md:col-span-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
+            <div className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between border-b pb-2 mb-3">
                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                   Today's Attendance Overview
@@ -679,26 +660,6 @@ export default function TenantClassDetailContainer({
               </div>
             </div>
 
-            {/* Average Attendance Card */}
-            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col justify-between">
-              <div className="flex items-center justify-between border-b pb-2 mb-3">
-                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                  Avg. Attendance
-                </span>
-                <Info className="h-4.5 w-4.5 text-zinc-400" />
-              </div>
-              <div className="flex items-end h-full mt-2">
-                <span className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-50">
-                  {cls.averageAttendance !== null &&
-                  cls.averageAttendance !== undefined
-                    ? `${cls.averageAttendance}%`
-                    : '—'}
-                </span>
-              </div>
-              <div className="text-[10px] text-zinc-400 italic mt-2">
-                Since term start.
-              </div>
-            </div>
           </div>
 
           {/* Main Grid Content: Left (Courses & Teachers), Right (Students) */}
@@ -833,83 +794,81 @@ export default function TenantClassDetailContainer({
             </div>
 
             {/* Enrolled Students Table Card */}
-            <div className="lg:col-span-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                    <Users className="h-4.5 w-4.5 text-primary shrink-0" />
-                    Enrolled Students ({cls.enrolledStudents?.length || 0})
-                  </h3>
-                  {hasPermission(PERMS.enrolment.create) &&
-                    cls.status === 'ACTIVE' && (
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => showBulkEnrolModal(classId)}
-                          className="h-8 text-xs font-semibold"
-                        >
-                          Bulk Enrol
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => showEnrolStudentModal(classId)}
-                          className="h-8 text-xs font-semibold"
-                        >
-                          Enrol Student
-                        </Button>
-                      </div>
-                    )}
-                </div>
-
-                {!cls.enrolledStudents || cls.enrolledStudents.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-center">
-                    <Users className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mb-2" />
-                    <span className="text-xs font-semibold">
-                      No students enrolled
-                    </span>
-                    <span className="text-[10px] text-zinc-400 mt-0.5">
-                      Students can be enrolled in this section from the student
-                      database.
-                    </span>
-                  </div>
-                ) : (
-                  <div className="overflow-hidden border border-zinc-200 dark:border-zinc-800 rounded-lg max-h-96 overflow-y-auto">
-                    <Table>
-                      <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                          <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                              <TableHead key={header.id}>
-                                {header.isPlaceholder
-                                  ? null
-                                  : flexRender(
-                                      header.column.columnDef.header,
-                                      header.getContext(),
-                                    )}
-                              </TableHead>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableHeader>
-                      <TableBody>
-                        {table.getRowModel().rows.map((row) => (
-                          <TableRow key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
-                              <TableCell key={cell.id}>
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
+            <div className="lg:col-span-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs flex flex-col">
+              <div className="flex items-center justify-between border-b pb-2 mb-3 shrink-0">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+                  <Users className="h-4.5 w-4.5 text-primary shrink-0" />
+                  Enrolled Students ({cls.enrolledStudents?.length || 0})
+                </h3>
+                {hasPermission(PERMS.enrolment.create) &&
+                  cls.status === 'ACTIVE' && (
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => showBulkEnrolModal(classId)}
+                        className="h-8 text-xs font-semibold"
+                      >
+                        Bulk Enrol
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => showEnrolStudentModal(classId)}
+                        className="h-8 text-xs font-semibold"
+                      >
+                        Enrol Student
+                      </Button>
+                    </div>
+                  )}
               </div>
+
+              {!cls.enrolledStudents || cls.enrolledStudents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-center flex-1">
+                  <Users className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mb-2" />
+                  <span className="text-xs font-semibold">
+                    No students enrolled
+                  </span>
+                  <span className="text-[10px] text-zinc-400 mt-0.5">
+                    Students can be enrolled in this section from the student
+                    database.
+                  </span>
+                </div>
+              ) : (
+                <div className="overflow-hidden border border-zinc-200 dark:border-zinc-800 rounded-lg flex-1 min-h-0 overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody>
+                      {table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>

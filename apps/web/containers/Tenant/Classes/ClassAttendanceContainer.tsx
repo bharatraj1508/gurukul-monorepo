@@ -191,8 +191,9 @@ export default function ClassAttendanceContainer({
       {
         id: 'attendance',
         header: 'Attendance',
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
           const enrolmentId = row.original.enrolmentId;
+          const { draft, updateDraft, canMark, isSaving } = table.options.meta as any;
           const currentStatus = draft[enrolmentId]?.status || 'PRESENT';
           return (
             <div className="flex items-center gap-1">
@@ -237,29 +238,36 @@ export default function ClassAttendanceContainer({
       {
         id: 'remark',
         header: 'Remark',
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
           const enrolmentId = row.original.enrolmentId;
+          const { draft, updateDraft, canMark, isSaving } = table.options.meta as any;
           return (
-            <Textarea
+            <Input
               value={draft[enrolmentId]?.remark || ''}
               onChange={(e) =>
                 updateDraft(enrolmentId, 'remark', e.target.value)
               }
               disabled={!canMark || isSaving}
               placeholder="Optional remark..."
-              className="min-h-[36px] h-9 text-xs py-2 resize-none"
+              className="h-9 text-xs"
             />
           );
         },
       },
     ],
-    [draft, canMark, isSaving],
+    [],
   );
 
   const table = useReactTable({
     data: data?.sheet || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    meta: {
+      draft,
+      updateDraft,
+      canMark,
+      isSaving,
+    },
   });
 
   return (
