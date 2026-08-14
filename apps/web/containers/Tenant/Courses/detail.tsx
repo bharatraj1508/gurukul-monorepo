@@ -191,12 +191,20 @@ export default function TenantCourseDetailContainer({
           </div>
         </div>
 
-        {hasPermission(PERMS.course.edit) && (
-          <Button onClick={() => showCourseModal(course)} size="sm">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Course
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/academics/courses/${course.id}/syllabus`}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Manage Syllabus
+            </Link>
           </Button>
-        )}
+          {hasPermission(PERMS.course.edit) && (
+            <Button onClick={() => showCourseModal(course)} size="sm">
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Course
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Metrics Card Grid */}

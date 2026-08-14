@@ -45,5 +45,12 @@ export const hod: DefaultRoleDefinition = {
     PERMS.notice.editOwn.id,
     PERMS.notice.deleteOwn.id,
     PERMS.notice.manage.id,
+    // Lesson Plans — approve + view all, plus own creation
+    PERMS.lessonPlan.view.id,
+    PERMS.lessonPlan.viewOwn.id,
+    PERMS.lessonPlan.create.id,
+    PERMS.lessonPlan.edit.id,
+    PERMS.lessonPlan.approve.id,
+    PERMS.lessonPlan.delete.id,
   ],
 };

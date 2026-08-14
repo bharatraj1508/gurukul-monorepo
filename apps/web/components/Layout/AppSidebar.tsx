@@ -33,6 +33,8 @@ import {
   LayoutDashboard,
   LogOut,
   Megaphone,
+  Notebook,
+  ClipboardCheck,
   Settings,
   UserCheck,
   Users,
@@ -63,7 +65,10 @@ export function AppSidebar() {
     hasPermission(PERMS.course.view) || hasPermission(PERMS.course.viewOwn);
   const showClasses =
     hasPermission(PERMS.class.view) || hasPermission(PERMS.class.viewOwn);
-  const showAcademics = showTerms || showPrograms || showCourses || showClasses;
+  const showLessonPlans =
+    hasPermission(PERMS.lessonPlan.viewOwn) || hasPermission(PERMS.lessonPlan.view);
+  const showLessonPlanReview = hasPermission(PERMS.lessonPlan.approve);
+  const showAcademics = showTerms || showPrograms || showCourses || showClasses || showLessonPlans;
 
   const showNotices =
     hasPermission(PERMS.notice.createClass) ||
@@ -80,7 +85,7 @@ export function AppSidebar() {
 
   const [isErpOpen, setIsErpOpen] = useState(pathname.startsWith('/users'));
   const [isAcademicsOpen, setIsAcademicsOpen] = useState(
-    pathname.startsWith('/academics'),
+    pathname.startsWith('/academics') || pathname.startsWith('/lesson-plans'),
   );
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(
     pathname.startsWith('/notices') || pathname.startsWith('/announcements'),
@@ -288,6 +293,37 @@ export function AppSidebar() {
                       >
                         <Link href="/academics/classes">
                           <span>Classes</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  )}
+                  {showLessonPlans && (
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={
+                          pathname === '/academics/lesson-plans' ||
+                          (pathname.startsWith('/academics/lesson-plans') && pathname !== '/academics/lesson-plans/review')
+                        }
+                        className="w-full justify-start gap-2 py-1 px-2 text-xs rounded-md cursor-pointer"
+                      >
+                        <Link href="/academics/lesson-plans">
+                          <Notebook className="h-3.5 w-3.5" />
+                          <span>Lesson Plans</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  )}
+                  {showLessonPlanReview && (
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={pathname === '/academics/lesson-plans/review'}
+                        className="w-full justify-start gap-2 py-1 px-2 text-xs rounded-md cursor-pointer"
+                      >
+                        <Link href="/academics/lesson-plans/review">
+                          <ClipboardCheck className="h-3.5 w-3.5" />
+                          <span>Lesson Plan Review</span>
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
