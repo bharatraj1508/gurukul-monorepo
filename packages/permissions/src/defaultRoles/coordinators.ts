@@ -43,5 +43,7 @@ export const coordinators: DefaultRoleDefinition = {
     PERMS.role.view.id,
     PERMS.tenant.view.id,
     PERMS.notice.all.id,
+    // Lesson Plans — full access
+    PERMS.lessonPlan.all.id,
   ],
 };

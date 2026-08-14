@@ -34,6 +34,8 @@ model Tenant {
   savedFilters           SavedFilter[]
   notices                Notice[]
   announcements          Announcement[]
+  syllabusTopics         SyllabusTopic[]
+  lessonPlans            LessonPlan[]
 
   @@map("tenants")
 }
@@ -115,6 +117,8 @@ model TenantMembership {
   classInstructors ClassInstructor[]
   studentProfiles  StudentProfile[]
   parentProfiles   ParentProfile[]
+  createdLessonPlans  LessonPlan[]  @relation("LessonPlanCreatedBy")
+  reviewedLessonPlans LessonPlan[]  @relation("LessonPlanReviewedBy")
 
   @@unique([tenantId, userId])
   @@map("tenant_memberships")
@@ -185,10 +189,11 @@ model AcademicTerm {
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
 
-  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  creator User?   @relation("AcademicTermCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updater User?   @relation("AcademicTermUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-  classes Class[]
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator     User?        @relation("AcademicTermCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater     User?        @relation("AcademicTermUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  classes     Class[]
+  lessonPlans LessonPlan[]
 
   @@index([tenantId, name])
   @@map("academic_terms")
@@ -235,6 +240,8 @@ model Course {
   creator               User?                   @relation("CourseCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   updater               User?                   @relation("CourseUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
   instructorAssignments ClassInstructorCourse[]
+  syllabusTopics        SyllabusTopic[]
+  lessonPlans           LessonPlan[]
 
   @@unique([tenantId, code])
   @@map("courses")
@@ -262,6 +269,7 @@ model Class {
   instructors  ClassInstructor[]
   enrolments   Enrolment[]
   notices      NoticeClass[]
+  lessonPlans  LessonPlan[]
 
   @@index([tenantId, academicTermId])
   @@map("classes")
@@ -505,4 +513,97 @@ model Announcement {
 
   @@index([tenantId, status, startDate, endDate])
   @@map("announcements")
+}
+
+// =====================================================
+// SYLLABUS TOPICS
+// =====================================================
+model SyllabusTopic {
+  id         String    @id @default(uuid()) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  courseId   String    @map("course_id") @db.Uuid
+  parentId   String?   @map("parent_id") @db.Uuid
+  title      String    @db.VarChar(255)
+  orderIndex Int       @default(0) @map("order_index")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant   Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  course   Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  parent   SyllabusTopic?  @relation("TopicHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children SyllabusTopic[] @relation("TopicHierarchy")
+  planItems LessonPlanItem[]
+
+  @@index([tenantId, courseId])
+  @@map("syllabus_topics")
+}
+
+// =====================================================
+// LESSON PLANS
+// Status lifecycle: DRAFT → SUBMITTED → APPROVED | REVISION_REQUESTED → SUBMITTED → ...
+// =====================================================
+model LessonPlan {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenantId        String    @map("tenant_id") @db.Uuid
+  classId         String    @map("class_id") @db.Uuid
+  courseId        String    @map("course_id") @db.Uuid
+  academicTermId  String    @map("academic_term_id") @db.Uuid
+  createdById     String    @map("created_by") @db.Uuid
+  planType        String    @db.VarChar(20)
+  // WEEKLY | MONTHLY
+  weekNumber      Int?      @map("week_number")
+  month           Int?
+  year            Int
+  startDate       DateTime  @map("start_date") @db.Date
+  endDate         DateTime  @map("end_date") @db.Date
+  status          String    @default("DRAFT") @db.VarChar(30)
+  // DRAFT | SUBMITTED | APPROVED | REVISION_REQUESTED
+  version         Int       @default(1)
+  parentVersionId String?   @map("parent_version_id") @db.Uuid
+  generalRemarks  String?   @map("general_remarks") @db.Text
+  reviewedById    String?   @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime? @map("reviewed_at") @db.Timestamp(6)
+  submittedAt     DateTime? @map("submitted_at") @db.Timestamp(6)
+  approvedAt      DateTime? @map("approved_at") @db.Timestamp(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  class         Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
+  course        Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  academicTerm  AcademicTerm     @relation(fields: [academicTermId], references: [id], onDelete: Cascade)
+  creator       TenantMembership @relation("LessonPlanCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  reviewer      TenantMembership? @relation("LessonPlanReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  parentVersion LessonPlan?      @relation("LessonPlanVersions", fields: [parentVersionId], references: [id], onDelete: SetNull)
+  childVersions LessonPlan[]     @relation("LessonPlanVersions")
+  items         LessonPlanItem[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, createdById, academicTermId])
+  @@map("lesson_plans")
+}
+
+// =====================================================
+// LESSON PLAN ITEMS (per-topic entries)
+// =====================================================
+model LessonPlanItem {
+  id               String   @id @default(uuid()) @db.Uuid
+  lessonPlanId     String   @map("lesson_plan_id") @db.Uuid
+  syllabusTopicId  String   @map("syllabus_topic_id") @db.Uuid
+  estimatedHours   Decimal  @map("estimated_hours") @db.Decimal(4, 1)
+  methodology      String   @db.VarChar(100)
+  // Lecture | Lab | Group Activity | Presentation | Discussion | Project | Demonstration
+  resources        String?  @db.Text
+  learningOutcomes String?  @map("learning_outcomes") @db.Text
+  hodComment       String?  @map("hod_comment") @db.Text
+  orderIndex       Int      @default(0) @map("order_index")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  lessonPlan    LessonPlan    @relation(fields: [lessonPlanId], references: [id], onDelete: Cascade)
+  syllabusTopic SyllabusTopic @relation(fields: [syllabusTopicId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_plan_items")
 }

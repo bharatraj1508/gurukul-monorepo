@@ -10,6 +10,7 @@ import { enrolmentFeature } from './enrolment';
 import { feeFeature } from './fee';
 import { gradeFeature } from './grade';
 import { instructorFeature } from './instructor';
+import { lessonPlanFeature } from './lessonPlan';
 import { libraryFeature } from './library';
 import { noticeFeature } from './notice';
 import { parentFeature } from './parent';
@@ -44,6 +45,7 @@ export const FEATURES: Readonly<Record<FeatureKey, FeatureDefinition>> = {
   report: reportFeature,
   notice: noticeFeature,
   announcement: announcementFeature,
+  lessonPlan: lessonPlanFeature,
 };
 
 // Lookup helper used only by the PERMS facade below.
@@ -214,6 +216,15 @@ export const PERMS = {
     editOwn: p('announcement', 'edit-own-announcement'),
     deleteOwn: p('announcement', 'delete-own-announcement'),
     manage: p('announcement', 'manage-announcements'),
+  },
+  lessonPlan: {
+    all: FEATURES.lessonPlan.all,
+    view: p('lessonPlan', 'view-lesson-plans'),
+    viewOwn: p('lessonPlan', 'view-own-lesson-plans'),
+    create: p('lessonPlan', 'create-lesson-plans'),
+    edit: p('lessonPlan', 'edit-lesson-plans'),
+    approve: p('lessonPlan', 'approve-lesson-plans'),
+    delete: p('lessonPlan', 'delete-lesson-plans'),
   },
 } as const;
 

@@ -19,6 +19,7 @@ import { TenantGuard } from './common/guards/tenant.guard';
 import { CoursesModule } from './courses/courses.module';
 import { EnrolmentsModule } from './enrolments/enrolments.module';
 import { InstructorsModule } from './instructors/instructors.module';
+import { LessonPlansModule } from './lesson-plans/lesson-plans.module';
 import { MembersModule } from './members/members.module';
 import { ParentsModule } from './parents/parents.module';
 import { ProgramsModule } from './programs/programs.module';
@@ -27,6 +28,7 @@ import { SavedFiltersModule } from './saved-filters/saved-filters.module';
 import { NoticesModule } from './notices/notices.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { StudentsModule } from './students/students.module';
+import { SyllabusTopicsModule } from './syllabus-topics/syllabus-topics.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
@@ -97,6 +99,8 @@ import { UsersModule } from './users/users.module';
     SavedFiltersModule,
     NoticesModule,
     AnnouncementsModule,
+    SyllabusTopicsModule,
+    LessonPlansModule,
   ],
   controllers: [AppController],
   providers: [

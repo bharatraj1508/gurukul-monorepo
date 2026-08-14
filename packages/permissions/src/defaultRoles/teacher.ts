@@ -10,7 +10,8 @@ export const teacher: DefaultRoleDefinition = {
   scopes: [
     // Dashboard — own
     PERMS.dashboard.viewOwn.id,
-    // Academics — view own assigned
+    // Academics — view terms & own assigned
+    PERMS.academicTerm.view.id,
     PERMS.course.viewOwn.id,
     PERMS.class.viewOwn.id,
     // People — view students in own classes
@@ -32,5 +33,10 @@ export const teacher: DefaultRoleDefinition = {
     PERMS.notice.createClass.id,
     PERMS.notice.editOwn.id,
     PERMS.notice.deleteOwn.id,
+    // Lesson Plans
+    PERMS.lessonPlan.viewOwn.id,
+    PERMS.lessonPlan.create.id,
+    PERMS.lessonPlan.edit.id,
+    PERMS.lessonPlan.delete.id,
   ],
 };
